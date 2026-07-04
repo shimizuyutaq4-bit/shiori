@@ -1,0 +1,1412 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>栞 — AI文豪コンシェルジュ</title>
+<style>
+  :root{
+    --bg:#efe7d6; --paper:#f7f1e3; --ink:#2b2620; --sub:#7a6f5c;
+    --line:#d8cdb4; --accent:#9a4b3f; --accent2:#c99a3e;
+    --font-serif:"Yu Mincho","YuMincho","Hiragino Mincho ProN","Hiragino Mincho Pro","Noto Serif JP","MS PMincho",serif;
+    --reader-size:22px; --reader-lh:2.0;
+  }
+  [data-theme="light"]{ --bg:#eceef2; --paper:#ffffff; --ink:#20242b; --sub:#6b7280; --line:#e2e5ea; --accent:#8a3f36; --accent2:#b8862f; }
+  [data-theme="dark"]{ --bg:#14120f; --paper:#1b1813; --ink:#e6ddca; --sub:#9a8f78; --line:#2c281f; --accent:#d98a6a; --accent2:#d3ad5a; }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--font-serif);
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    overflow:hidden;
+  }
+  button{font-family:inherit; cursor:pointer}
+  .hidden{display:none !important}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:fixed; top:0; left:0; right:0; height:calc(56px + env(safe-area-inset-top)); z-index:40;
+    padding-top:env(safe-area-inset-top); box-sizing:border-box;
+    display:flex; align-items:center; gap:14px; padding-left:18px; padding-right:18px;
+    background:color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex; align-items:baseline; gap:10px; cursor:pointer; user-select:none}
+  .brand .logo{font-size:26px; font-weight:600; letter-spacing:.06em; color:var(--accent)}
+  .brand .sub{font-size:11px; color:var(--sub); letter-spacing:.28em}
+  .spacer{flex:1}
+  .icon-btn{
+    border:1px solid var(--line); background:var(--paper); color:var(--ink);
+    border-radius:10px; padding:8px 12px; font-size:13px; line-height:1; white-space:nowrap;
+    display:inline-flex; align-items:center; gap:6px; transition:.15s;
+  }
+  .icon-btn:hover{border-color:var(--accent); color:var(--accent)}
+  .icon-btn.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+
+  /* ---------- library ---------- */
+  .view{position:fixed; top:calc(56px + env(safe-area-inset-top)); left:0; right:0; bottom:0; overflow:auto}
+  .library-wrap{max-width:1080px; margin:0 auto; padding:34px 24px 80px}
+  .lib-hero{margin-bottom:26px}
+  .lib-hero h1{font-size:30px; margin:0 0 8px; font-weight:600; letter-spacing:.04em}
+  .lib-hero p{margin:0; color:var(--sub); font-size:14px; line-height:1.9}
+  .search{
+    margin:22px 0 8px; display:flex; gap:10px; align-items:center;
+  }
+  .search input{
+    flex:1; padding:12px 16px; border:1px solid var(--line); border-radius:12px;
+    background:var(--paper); color:var(--ink); font-family:inherit; font-size:15px;
+  }
+  .search input:focus{outline:none; border-color:var(--accent)}
+  .lib-count{font-size:12.5px; color:var(--sub); margin:0 2px 20px}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:18px}
+  .card{
+    position:relative; background:var(--paper); border:1px solid var(--line);
+    border-radius:16px; padding:20px 18px 18px; cursor:pointer; overflow:hidden;
+    transition:.18s; min-height:180px; display:flex; flex-direction:column;
+  }
+  .card:hover{transform:translateY(-3px); border-color:var(--accent); box-shadow:0 10px 30px -18px rgba(0,0,0,.45)}
+  .card .spine{position:absolute; top:0; right:0; bottom:0; width:6px; background:linear-gradient(var(--accent),var(--accent2))}
+  .card .vtitle{
+    writing-mode:vertical-rl; font-size:22px; font-weight:600; letter-spacing:.08em;
+    height:120px; margin-left:auto; line-height:1.25;
+  }
+  .card .author{margin-top:auto; font-size:12.5px; color:var(--sub); letter-spacing:.05em}
+  .card .badge{position:absolute; top:14px; left:16px; font-size:10px; color:var(--sub)}
+  .card.readmark::after{content:"栞"; position:absolute; top:-2px; left:14px; font-size:20px; color:var(--accent);}
+  .author-head{grid-column:1/-1; font-size:13px; color:var(--sub); letter-spacing:.12em; border-bottom:1px solid var(--line); padding:14px 2px 8px; margin-top:6px}
+  .card .meta{display:flex; align-items:center; gap:9px; margin-top:9px; font-size:11px; color:var(--sub); flex-wrap:wrap}
+  .card .diffm{letter-spacing:1px; font-size:9px; white-space:nowrap}
+  .card .diffm .f{color:#6f8fb0} .card .diffm .e{color:var(--line)}
+  .card .rt{white-space:nowrap}
+  .card .btag{background:var(--accent2); color:#fff; padding:2px 7px; border-radius:20px; font-size:10px; letter-spacing:.03em}
+  .card .checkbtn{position:absolute; top:10px; left:12px; z-index:3; border:1px solid var(--line); background:var(--paper); color:var(--sub);
+    font-size:11px; line-height:1; padding:5px 9px 5px 8px; border-radius:20px; display:inline-flex; align-items:center; gap:4px; transition:.15s}
+  .card .checkbtn:hover{border-color:var(--accent2); color:var(--accent2)}
+  .card .checkbtn.on{background:var(--accent2); color:#fff; border-color:var(--accent2)}
+  .card .checkbtn.on span{font-weight:600}
+  .card .statusline{display:flex; align-items:center; gap:8px; margin-top:7px; font-size:11px}
+  .card .stt{padding:2px 9px; border-radius:20px; border:1px solid var(--line); color:var(--sub); white-space:nowrap}
+  .card .stt.reading{color:var(--accent); border-color:var(--accent)}
+  .card .stt.done{background:var(--accent); color:#fff; border-color:var(--accent)}
+  .rev-stars{letter-spacing:1px; font-size:11px}
+  .rev-stars .on{color:var(--accent2)} .rev-stars .off{opacity:.28}
+  .rate{display:flex; align-items:center; gap:2px; flex-wrap:wrap}
+  .star-btn{border:none; background:transparent; font-size:32px; line-height:1; color:var(--line); cursor:pointer; padding:0 2px; transition:transform .1s}
+  .star-btn.on{color:var(--accent2)}
+  .star-btn:hover{transform:scale(1.12)}
+  .rate-label{margin-left:12px; font-size:13px; color:var(--sub)}
+  #reviewText{width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:10px; background:var(--bg); color:var(--ink); font-family:inherit; font-size:14px; resize:vertical; line-height:1.8}
+  .finish-toast{position:absolute; left:50%; bottom:calc(74px + env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:30; display:flex; align-items:center; gap:12px; background:var(--paper); border:1px solid var(--line); box-shadow:0 14px 34px -16px rgba(0,0,0,.55); border-radius:14px; padding:11px 15px; font-size:13px; animation:slideIn .3s ease}
+  .finish-toast .ft-yes{border:none; background:var(--accent); color:#fff; padding:8px 14px; border-radius:10px; font-size:13px}
+  .finish-toast .ft-no{border:1px solid var(--line); background:var(--bg); color:var(--sub); padding:8px 12px; border-radius:10px; font-size:12px}
+  .lib-controls{display:flex; gap:9px; flex-wrap:wrap; align-items:center; margin:0 2px 6px}
+  .lib-controls .lbl{font-size:12.5px; color:var(--sub)}
+  .lib-controls select,.chipbtn{padding:8px 12px; border:1px solid var(--line); border-radius:10px; background:var(--paper); color:var(--ink); font-family:inherit; font-size:13px}
+  .chipbtn{cursor:pointer; transition:.15s}
+  .chipbtn:hover{border-color:var(--accent2)}
+  .chipbtn.on{background:var(--accent2); color:#fff; border-color:var(--accent2)}
+
+  /* ---------- reader ---------- */
+  #reader.view{overflow:hidden; background:var(--bg)}
+  .stage{position:absolute; top:8px; left:8px; right:8px; bottom:calc(60px + env(safe-area-inset-bottom)); overflow:hidden; border-radius:14px;
+    background:var(--paper); box-shadow:0 4px 40px -24px rgba(0,0,0,.5); border:1px solid var(--line);}
+  .book{
+    position:absolute; top:42px; right:52px; bottom:42px; left:auto;
+    writing-mode:vertical-rl; -webkit-writing-mode:vertical-rl;
+    font-size:var(--reader-size); line-height:var(--reader-lh); color:var(--ink);
+    transition:transform .38s cubic-bezier(.2,.7,.2,1);
+    text-align:justify;
+  }
+  .book h1.title{font-size:1.5em; font-weight:600; margin:0 1.4em 0 0; letter-spacing:.08em}
+  .book h2.author{font-size:.82em; color:var(--sub); margin:0 1.6em 0 0}
+  .book .main_text{margin:0}
+  .book p{margin:0}
+  .book rt{font-size:.72em; color:var(--ink); opacity:.95; line-height:1.05; letter-spacing:0}
+  .book img.gaiji{width:1em; height:1em; vertical-align:-.1em}
+  .stage .page-turn{position:absolute; top:0; bottom:0; width:22%; z-index:5; cursor:pointer}
+  .stage .pt-next{left:0} .stage .pt-prev{right:0}
+  .stage .edge-hint{position:absolute; top:50%; transform:translateY(-50%); font-size:20px; color:var(--sub); opacity:0; transition:.2s; pointer-events:none}
+  .stage:hover .edge-hint{opacity:.4}
+  .pt-next .edge-hint{left:12px} .pt-prev .edge-hint{right:12px}
+
+  .readbar{position:absolute; left:0; right:0; bottom:0; min-height:56px; z-index:20;
+    padding-bottom:env(safe-area-inset-bottom);
+    display:flex; align-items:center; gap:16px; padding-left:20px; padding-right:20px;
+    background:color-mix(in srgb,var(--paper) 92%, transparent); border-top:1px solid var(--line); backdrop-filter:blur(6px)}
+  .readbar .rtitle{font-size:13px; color:var(--sub); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:24vw}
+  .progress{flex:1; height:6px; background:var(--line); border-radius:6px; position:relative; cursor:pointer}
+  .progress .bar{position:absolute; top:0; bottom:0; right:0; background:linear-gradient(90deg,var(--accent2),var(--accent)); border-radius:6px; width:0%}
+  .pageno{font-size:12.5px; color:var(--ink); min-width:110px; text-align:center; font-variant-numeric:tabular-nums; font-weight:600}
+
+  /* ---------- floating selection tip ---------- */
+  #seltip{position:fixed; z-index:60; transform:translate(-50%,-120%); background:var(--accent); color:#fff;
+    border:none; border-radius:20px; padding:8px 14px; font-size:12.5px; box-shadow:0 8px 24px -10px rgba(0,0,0,.5)}
+  #seltip::after{content:""; position:absolute; left:50%; bottom:-5px; transform:translateX(-50%) rotate(45deg); width:10px; height:10px; background:var(--accent)}
+
+  /* ---------- drawers / modals ---------- */
+  .scrim{position:fixed; inset:0; z-index:70; background:rgba(20,16,10,.42); backdrop-filter:blur(2px); display:flex; justify-content:flex-end}
+  .scrim.center{align-items:center; justify-content:center}
+  .drawer{width:min(420px,92vw); height:100%; background:var(--paper); border-left:1px solid var(--line);
+    display:flex; flex-direction:column; animation:slideIn .28s ease}
+  @keyframes slideIn{from{transform:translateX(30px); opacity:.4}to{transform:none; opacity:1}}
+  .modal{width:min(560px,94vw); max-height:88vh; overflow:auto; background:var(--paper); border-radius:18px; border:1px solid var(--line); animation:slideIn .2s ease}
+  .dhead{display:flex; align-items:center; gap:10px; padding:18px 20px; border-bottom:1px solid var(--line)}
+  .dhead h3{margin:0; font-size:16px; font-weight:600; letter-spacing:.04em}
+  .dhead .close{margin-left:auto}
+  .dbody{padding:18px 20px; overflow:auto; flex:1}
+  .field{margin-bottom:18px}
+  .field label{display:block; font-size:12.5px; color:var(--sub); margin-bottom:7px; letter-spacing:.03em}
+  .field input[type=text],.field input[type=password],.field select{
+    width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:10px; background:var(--bg); color:var(--ink); font-family:inherit; font-size:14px}
+  .seg{display:flex; gap:8px; flex-wrap:wrap}
+  .seg button{flex:1; min-width:70px; padding:10px; border:1px solid var(--line); background:var(--bg); border-radius:10px; color:var(--ink); font-size:13px}
+  .seg button.on{background:var(--accent); color:#fff; border-color:var(--accent)}
+  .note{font-size:11.5px; color:var(--sub); line-height:1.7; margin-top:6px}
+  .btn-primary{width:100%; padding:12px; border:none; border-radius:11px; background:var(--accent); color:#fff; font-size:14px; letter-spacing:.05em}
+  .btn-ghost{width:100%; padding:11px; border:1px solid var(--line); border-radius:11px; background:var(--bg); color:var(--ink); font-size:13px}
+  .btn-ghost:hover{border-color:var(--accent); color:var(--accent)}
+  .ai-out a{color:var(--accent)}
+
+  /* AI assistant drawer */
+  .ai-tabs{display:flex; gap:8px; padding:14px 20px 0}
+  .ai-tabs button{flex:1; padding:9px; border:1px solid var(--line); background:var(--bg); border-radius:10px 10px 0 0; border-bottom:none; font-size:12.5px; color:var(--sub)}
+  .ai-tabs button.on{background:var(--paper); color:var(--accent); font-weight:600}
+  .ai-out{white-space:pre-wrap; line-height:1.95; font-size:14.5px; margin-top:6px}
+  .ai-out.placeholder{color:var(--sub)}
+  .illust{width:100%; aspect-ratio:1/1; border-radius:14px; border:1px solid var(--line); overflow:hidden; background:var(--bg); display:flex; align-items:center; justify-content:center}
+  .illust img{width:100%; height:100%; object-fit:cover}
+  .illust svg{width:100%; height:100%; display:block}
+  .spin{width:20px; height:20px; border:2px solid var(--line); border-top-color:var(--accent); border-radius:50%; animation:sp .8s linear infinite; display:inline-block; vertical-align:-4px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .demo-tag{display:inline-block; font-size:10px; letter-spacing:.1em; color:#fff; background:var(--accent2); padding:2px 7px; border-radius:6px; margin-left:8px; vertical-align:2px}
+
+  .loading-full{position:absolute; inset:0; z-index:15; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+    background:var(--paper); color:var(--ink); font-size:15px; line-height:1.9; text-align:center; padding:24px}
+  .loading-full .spin{width:26px; height:26px; border-width:3px}
+  .loading-full #readerLoadingMsg{max-width:22em}
+
+  @media (max-width:640px){
+    .book{right:22px; top:24px; bottom:24px}
+    .book rt{font-size:.85em}
+    .brand .sub{display:none}
+    .brand .logo{font-size:23px}
+    .topbar{gap:6px; padding:0 10px}
+    .icon-btn{padding:8px 9px; font-size:16px}
+    .btl{display:none}
+    .lib-controls{gap:7px}
+    .lib-controls select,.chipbtn{padding:7px 9px; font-size:12.5px}
+    .library-wrap{padding:22px 14px 72px}
+    .lib-hero h1{font-size:24px}
+    .drawer{width:100vw}
+    .readbar{gap:10px; padding:0 12px}
+    .readbar .rtitle{max-width:34vw}
+  }
+</style>
+</head>
+<body data-theme="washi">
+
+<!-- ========== TOP BAR ========== -->
+<div class="topbar">
+  <div class="brand" onclick="showLibrary()">
+    <span class="logo">栞</span>
+    <span class="sub">SHIORI &nbsp;/&nbsp; AI文豪コンシェルジュ</span>
+  </div>
+  <div class="spacer"></div>
+  <button class="icon-btn" id="btn-dict" onclick="openAI('dict')" title="辞書" hidden>📚<span class="btl"> 辞書</span></button>
+  <button class="icon-btn" id="btn-summary" onclick="openAI('summary')" title="あらすじ・解説" hidden>📖<span class="btl"> あらすじ・解説</span></button>
+  <button class="icon-btn" id="btn-check" onclick="toggleCheckReader()" title="気になる（あとで読む）に登録" hidden>🔖<span class="btl"> 気になる</span></button>
+  <button class="icon-btn" id="btn-review" onclick="openReview(cur.work&&cur.work.id)" title="レビュー" hidden>📝<span class="btl"> レビュー</span></button>
+  <button class="icon-btn" id="btn-ruby" onclick="toggleRuby()" title="ふりがな（総ルビ）" hidden>ふ<span class="btl"> ふりがな</span></button>
+  <button class="icon-btn" onclick="openSettings()" title="設定">⚙️<span class="btl"> 設定</span></button>
+</div>
+
+<!-- ========== LIBRARY ========== -->
+<div id="library" class="view">
+  <div class="library-wrap">
+    <div class="lib-hero">
+      <h1>作品棚</h1>
+      <p>著作権保護期間の終了した名作を、青空文庫から。縦書き・ルビ・外字に対応した読書体験に、AIの読解アシストと挿絵・演出を添えて。<br>読みたい一冊を選んでください。</p>
+    </div>
+    <div class="search">
+      <input id="searchInput" type="text" placeholder="作品名・著者名で絞り込み（例：太宰、羅生門、賢治）" oninput="renderLibrary()">
+    </div>
+    <div class="lib-controls">
+      <span class="lbl">並べ替え</span>
+      <select id="sortSel" onchange="setSort(this.value)">
+        <option value="author">著者順</option>
+        <option value="reco">おすすめ順</option>
+        <option value="easy">やさしい順</option>
+        <option value="short">短い順（読了目安）</option>
+        <option value="rating">評価の高い順</option>
+        <option value="recent">最近読んだ順</option>
+      </select>
+      <select id="statusSel" onchange="setStatusFilter(this.value)">
+        <option value="all">状態：すべて</option>
+        <option value="reading">読書中</option>
+        <option value="done">読了</option>
+        <option value="unread">未読</option>
+      </select>
+      <button class="chipbtn" id="begBtn" onclick="toggleBeginner()">◎ はじめての一冊</button>
+      <button class="chipbtn" id="checkBtn" onclick="toggleChecked()">🔖 気になる</button>
+    </div>
+    <div class="lib-count" id="libCount"></div>
+    <div id="grid" class="grid"></div>
+  </div>
+</div>
+
+<!-- ========== READER ========== -->
+<div id="reader" class="view hidden">
+  <div class="stage" id="stage">
+    <div class="page-turn pt-prev" onclick="turn(-1)"><span class="edge-hint">›</span></div>
+    <div class="page-turn pt-next" onclick="turn(1)"><span class="edge-hint">‹</span></div>
+    <div class="book" id="book"></div>
+    <div class="loading-full hidden" id="readerLoading"><span class="spin"></span><span id="readerLoadingMsg">本を開いています…</span></div>
+  </div>
+  <div class="readbar">
+    <span class="rtitle" id="readTitle"></span>
+    <div class="progress" id="progress" onclick="seekProgress(event)"><div class="bar" id="progBar"></div></div>
+    <span class="pageno" id="pageNo">— / —</span>
+  </div>
+  <div class="finish-toast hidden" id="finishToast">
+    <span>最後まで読み終えましたか？</span>
+    <button class="ft-yes" onclick="openReview(cur.work&&cur.work.id)">★ レビューを書く</button>
+    <button class="ft-no" onclick="document.getElementById('finishToast').classList.add('hidden')">あとで</button>
+  </div>
+</div>
+
+<button id="seltip" class="hidden" onmousedown="event.preventDefault()" onclick="lookupSelection()">📖 意味を調べる</button>
+
+<script>
+/* =========================================================
+   栞 SHIORI — single file Aozora reader + AI concierge
+   ========================================================= */
+const RAW = "https://raw.githubusercontent.com/aozorabunko/aozorabunko/master/cards/";
+
+const WORKS = [
+  // 芥川龍之介
+  {id:"rashomon",   title:"羅生門",           author:"芥川龍之介", file:"000879/files/127_15260.html"},
+  {id:"kumonoito",  title:"蜘蛛の糸",         author:"芥川龍之介", file:"000879/files/92_14545.html"},
+  {id:"toshishun",  title:"杜子春",           author:"芥川龍之介", file:"000879/files/170_15144.html"},
+  {id:"jigokuhen",  title:"地獄変",           author:"芥川龍之介", file:"000879/files/61_15130.html"},
+  {id:"yabunonaka", title:"藪の中",           author:"芥川龍之介", file:"000879/files/179_15255.html"},
+  {id:"kappa",      title:"河童",             author:"芥川龍之介", file:"000879/files/69_14933.html"},
+  {id:"imogayu",    title:"芋粥",             author:"芥川龍之介", file:"000879/files/55_14824.html"},
+  {id:"hana_a",     title:"鼻",               author:"芥川龍之介", file:"000879/files/42_15228.html"},
+  {id:"mikan",      title:"蜜柑",             author:"芥川龍之介", file:"000879/files/98_15272.html"},
+  {id:"torokko",    title:"トロッコ",         author:"芥川龍之介", file:"000879/files/43016_16836.html"},
+  // 太宰治
+  {id:"meros",      title:"走れメロス",       author:"太宰治",     file:"000035/files/1567_14913.html"},
+  {id:"ningen",     title:"人間失格",         author:"太宰治",     file:"000035/files/301_14912.html"},
+  {id:"shayo",      title:"斜陽",             author:"太宰治",     file:"000035/files/1565_8559.html"},
+  {id:"fugaku",     title:"富嶽百景",         author:"太宰治",     file:"000035/files/270_14914.html"},
+  {id:"viyon",      title:"ヴィヨンの妻",     author:"太宰治",     file:"000035/files/2253_14908.html"},
+  {id:"joshi",      title:"女生徒",           author:"太宰治",     file:"000035/files/275_13903.html"},
+  {id:"kakekomi",   title:"駈込み訴え",       author:"太宰治",     file:"000035/files/277_33098.html"},
+  {id:"outo",       title:"桜桃",             author:"太宰治",     file:"000035/files/308_14910.html"},
+  {id:"otogi",      title:"お伽草紙",         author:"太宰治",     file:"000035/files/52380_44331.html"},
+  // 夏目漱石
+  {id:"kokoro",     title:"こころ",           author:"夏目漱石",   file:"000148/files/773_14560.html"},
+  {id:"neko",       title:"吾輩は猫である",   author:"夏目漱石",   file:"000148/files/789_14547.html"},
+  {id:"botchan",    title:"坊っちゃん",       author:"夏目漱石",   file:"000148/files/752_14964.html"},
+  {id:"sanshiro",   title:"三四郎",           author:"夏目漱石",   file:"000148/files/58842_76759.html"},
+  {id:"sorekara",   title:"それから",         author:"夏目漱石",   file:"000148/files/56143_50921.html"},
+  {id:"mon",        title:"門",               author:"夏目漱石",   file:"000148/files/56923_66719.html"},
+  {id:"kusamakura", title:"草枕",             author:"夏目漱石",   file:"000148/files/776_14941.html"},
+  {id:"yumejuya",   title:"夢十夜",           author:"夏目漱石",   file:"000148/files/799_14972.html"},
+  // 宮沢賢治
+  {id:"ginga",      title:"銀河鉄道の夜",     author:"宮沢賢治",   file:"000081/files/456_15050.html"},
+  {id:"chumon",     title:"注文の多い料理店", author:"宮沢賢治",   file:"000081/files/43754_17659.html"},
+  {id:"gauche",     title:"セロ弾きのゴーシュ",author:"宮沢賢治",  file:"000081/files/470_15407.html"},
+  {id:"matasaburo", title:"風の又三郎",       author:"宮沢賢治",   file:"000081/files/462_15405.html"},
+  {id:"yodaka",     title:"よだかの星",       author:"宮沢賢治",   file:"000081/files/473_42318.html"},
+  {id:"donguri",    title:"どんぐりと山猫",   author:"宮沢賢治",   file:"000081/files/1925_17912.html"},
+  {id:"otsuberu",   title:"オツベルと象",     author:"宮沢賢治",   file:"000081/files/466_42316.html"},
+  {id:"budori",     title:"グスコーブドリの伝記",author:"宮沢賢治",file:"000081/files/1924_14254.html"},
+  // 森鴎外
+  {id:"maihime",    title:"舞姫",             author:"森鴎外",     file:"000129/files/682_15414.html"},
+  {id:"takasebune", title:"高瀬舟",           author:"森鴎外",     file:"000129/files/691_15352.html"},
+  {id:"sansho",     title:"山椒大夫",         author:"森鴎外",     file:"000129/files/689_23257.html"},
+  {id:"gan",        title:"雁",               author:"森鴎外",     file:"000129/files/45224_19919.html"},
+  // 梶井基次郎
+  {id:"lemon",      title:"檸檬",             author:"梶井基次郎", file:"000074/files/424_19826.html"},
+  {id:"sakura",     title:"桜の樹の下には",   author:"梶井基次郎", file:"000074/files/427_19793.html"},
+  // 中島敦
+  {id:"sangetsu",   title:"山月記",           author:"中島敦",     file:"000119/files/624_14544.html"},
+  {id:"meijin",     title:"名人伝",           author:"中島敦",     file:"000119/files/620_14533.html"},
+  {id:"deshi",      title:"弟子",             author:"中島敦",     file:"000119/files/1738_16623.html"},
+  {id:"riryo",      title:"李陵",             author:"中島敦",     file:"000119/files/1737_14534.html"},
+  // 樋口一葉
+  {id:"takekurabe", title:"たけくらべ",       author:"樋口一葉",   file:"000064/files/389_15297.html"},
+  {id:"nigorie",    title:"にごりえ",         author:"樋口一葉",   file:"000064/files/56042_54978.html"},
+  {id:"jusanya",    title:"十三夜",           author:"樋口一葉",   file:"000064/files/386_15291.html"},
+  // 坂口安吾
+  {id:"daraku",     title:"堕落論",           author:"坂口安吾",   file:"001095/files/42620_21407.html"},
+  {id:"hakuchi",    title:"白痴",             author:"坂口安吾",   file:"001095/files/42621_21290.html"},
+  // 泉鏡花
+  {id:"koya",       title:"高野聖",           author:"泉鏡花",     file:"000050/files/43466_26099.html"},
+  {id:"geka",       title:"外科室",           author:"泉鏡花",     file:"000050/files/360_19397.html"},
+  // 新美南吉
+  {id:"gongitsune", title:"ごん狐",           author:"新美南吉",   file:"000121/files/628_14895.html"},
+  {id:"tebukuro",   title:"手袋を買いに",     author:"新美南吉",   file:"000121/files/637_13341.html"},
+  // 小川未明
+  {id:"akairousoku",title:"赤い蝋燭と人魚",   author:"小川未明",   file:"001475/files/54372_46225.html"},
+  {id:"tsukiyo",    title:"月夜と眼鏡",       author:"小川未明",   file:"001475/files/51089_53359.html"},
+  // 横光利一
+  {id:"hae",        title:"蠅",               author:"横光利一",   file:"000168/files/2302_13371.html"},
+  {id:"harubasha",  title:"春は馬車に乗って", author:"横光利一",   file:"000168/files/904.html"},
+  // その他の名作
+  {id:"musashino",  title:"武蔵野",           author:"国木田独歩", file:"000038/files/329_15886.html"},
+  {id:"kanikosen",  title:"蟹工船",           author:"小林多喜二", file:"000156/files/1465_16805.html"},
+  {id:"onshu",      title:"恩讐の彼方に",     author:"菊池寛",     file:"000083/files/496_19866.html"},
+  {id:"kazetachinu",title:"風立ちぬ",         author:"堀辰雄",     file:"001030/files/4803_14204.html"},
+  {id:"hitofusa",   title:"一房の葡萄",       author:"有島武郎",   file:"000025/files/211_20472.html"},
+  {id:"chikyu",     title:"地球盗難",         author:"海野十三",   file:"000160/files/1258_40525.html"},
+  {id:"yoake",      title:"夜明け前",         author:"島崎藤村",   file:"000158/files/1504_14585.html"},
+  {id:"sumida",     title:"すみだ川",         author:"永井荷風",   file:"001341/files/50556_37667.html"},
+  // --- 追加（厳選65作品） ---
+  {id:"haguruma", title:"歯車", author:"芥川龍之介", file:"000879/files/40_15151.html"},
+  {id:"ahou", title:"或阿呆の一生", author:"芥川龍之介", file:"000879/files/19_14618.html"},
+  {id:"hokyonin", title:"奉教人の死", author:"芥川龍之介", file:"000879/files/49_15269.html"},
+  {id:"gesaku", title:"戯作三昧", author:"芥川龍之介", file:"000879/files/38_14487.html"},
+  {id:"butokai", title:"舞踏会", author:"芥川龍之介", file:"000879/files/28_15270.html"},
+  {id:"majutsu", title:"魔術", author:"芥川龍之介", file:"000879/files/95_15247.html"},
+  {id:"sarukani", title:"猿蟹合戦", author:"芥川龍之介", file:"000879/files/140_15196.html"},
+  {id:"aki", title:"秋", author:"芥川龍之介", file:"000879/files/16_14570.html"},
+  {id:"rokunomiya", title:"六の宮の姫君", author:"芥川龍之介", file:"000879/files/130_15275.html"},
+  {id:"tsugaru", title:"津軽", author:"太宰治", file:"000035/files/2282_15074.html"},
+  {id:"chikuken", title:"畜犬談", author:"太宰治", file:"000035/files/246_34649.html"},
+  {id:"goodbye", title:"グッド・バイ", author:"太宰治", file:"000035/files/258_20179.html"},
+  {id:"tokaton", title:"トカトントン", author:"太宰治", file:"000035/files/2285_15077.html"},
+  {id:"romanesque", title:"ロマネスク", author:"太宰治", file:"000035/files/316_19983.html"},
+  {id:"gyofuku", title:"魚服記", author:"太宰治", file:"000035/files/1563_9723.html"},
+  {id:"tokyo8", title:"東京八景", author:"太宰治", file:"000035/files/1569_23528.html"},
+  {id:"higan", title:"彼岸過迄", author:"夏目漱石", file:"000148/files/765_14961.html"},
+  {id:"kojin", title:"行人", author:"夏目漱石", file:"000148/files/775_14942.html"},
+  {id:"garasudo", title:"硝子戸の中", author:"夏目漱石", file:"000148/files/760_14940.html"},
+  {id:"buncho", title:"文鳥", author:"夏目漱石", file:"000148/files/753_42587.html"},
+  {id:"abe", title:"阿部一族", author:"森鴎外", file:"000129/files/673_23255.html"},
+  {id:"saigo", title:"最後の一句", author:"森鴎外", file:"000129/files/687_15356.html"},
+  {id:"kanzan", title:"寒山拾得", author:"森鴎外", file:"000129/files/679_15361.html"},
+  {id:"moso", title:"妄想", author:"森鴎外", file:"000129/files/683_23194.html"},
+  {id:"nametoko", title:"なめとこ山の熊", author:"宮沢賢治", file:"000081/files/1939_18755.html"},
+  {id:"tsuchigami", title:"土神ときつね", author:"宮沢賢治", file:"000081/files/46607_33649.html"},
+  {id:"hyoga", title:"氷河鼠の毛皮", author:"宮沢賢治", file:"000081/files/1934_17932.html"},
+  {id:"cairo", title:"カイロ団長", author:"宮沢賢治", file:"000081/files/1918_18512.html"},
+  {id:"kainohi", title:"貝の火", author:"宮沢賢治", file:"000081/files/1942_42611.html"},
+  {id:"otsugomori", title:"大つごもり", author:"樋口一葉", file:"000064/files/55668_72130.html"},
+  {id:"wakaremichi", title:"わかれ道", author:"樋口一葉", file:"000064/files/391_15301.html"},
+  {id:"mojika", title:"文字禍", author:"中島敦", file:"000119/files/622_14497.html"},
+  {id:"gojo", title:"悟浄出世", author:"中島敦", file:"000119/files/2521_14527.html"},
+  {id:"gojotan", title:"悟浄歎異", author:"中島敦", file:"000119/files/617_14530.html"},
+  {id:"fuyunohi", title:"冬の日", author:"梶井基次郎", file:"000074/files/417_19816.html"},
+  {id:"yaminoemaki", title:"闇の絵巻", author:"梶井基次郎", file:"000074/files/415_19818.html"},
+  {id:"aibu", title:"愛撫", author:"梶井基次郎", file:"000074/files/411_19633.html"},
+  {id:"utaandon", title:"歌行灯", author:"泉鏡花", file:"000050/files/3587_19541.html"},
+  {id:"kusameikyu", title:"草迷宮", author:"泉鏡花", file:"000050/files/3586_12103.html"},
+  {id:"sakuranomori", title:"桜の森の満開の下", author:"坂口安吾", file:"001095/files/42618_21410.html"},
+  {id:"kazehakase", title:"風博士", author:"坂口安吾", file:"001095/files/42616_21000.html"},
+  {id:"bunkashikan", title:"日本文化私観", author:"坂口安吾", file:"001095/files/42625_21289.html"},
+  {id:"hananoki", title:"花のき村と盗人たち", author:"新美南吉", file:"000121/files/630_21624.html"},
+  {id:"nobara", title:"野ばら", author:"小川未明", file:"001475/files/51034_47932.html"},
+  {id:"cain", title:"カインの末裔", author:"有島武郎", file:"000025/files/204_19524.html"},
+  {id:"chisaki", title:"小さき者へ", author:"有島武郎", file:"000025/files/206_20463.html"},
+  {id:"wasureenu", title:"忘れえぬ人々", author:"国木田独歩", file:"000038/files/1409_34798.html"},
+  {id:"gyuniku", title:"牛肉と馬鈴薯", author:"国木田独歩", file:"000038/files/323_43411.html"},
+  {id:"harunotori", title:"春の鳥", author:"国木田独歩", file:"000038/files/1057_15980.html"},
+  {id:"kikai", title:"機械", author:"横光利一", file:"000168/files/907_54297.html"},
+  {id:"atama", title:"頭ならびに腹", author:"横光利一", file:"000168/files/2158_23275.html"},
+  {id:"utsukushii", title:"美しい村", author:"堀辰雄", file:"001030/files/4812_14384.html"},
+  {id:"seikazoku", title:"聖家族", author:"堀辰雄", file:"001030/files/4802_14951.html"},
+  {id:"oshie", title:"押絵の奇蹟", author:"夢野久作", file:"000096/files/930_21997.html"},
+  {id:"shojo", title:"少女地獄", author:"夢野久作", file:"000096/files/935_23282.html"},
+  {id:"meotozenzai", title:"夫婦善哉", author:"織田作之助", file:"000040/files/545_33102.html"},
+  {id:"futon", title:"蒲団", author:"田山花袋", file:"000214/files/1669_8259.html"},
+  {id:"ippeisotsu", title:"一兵卒", author:"田山花袋", file:"000214/files/1066_43394.html"},
+  {id:"ukigumo", title:"浮雲", author:"二葉亭四迷", file:"000006/files/1869_33656.html"},
+  {id:"gojunoto", title:"五重塔", author:"幸田露伴", file:"000051/files/50351_36759.html"},
+  {id:"konjiki", title:"金色夜叉", author:"尾崎紅葉", file:"000091/files/522_77785.html"},
+  {id:"younenjidai", title:"幼年時代", author:"室生犀星", file:"001579/files/53013_78492.html"},
+  {id:"nekomachi", title:"猫町", author:"萩原朔太郎", file:"000067/files/641_21647.html"},
+  {id:"cement", title:"セメント樽の中の手紙", author:"葉山嘉樹", file:"000031/files/228_21664.html"},
+  {id:"byosho", title:"病牀六尺", author:"正岡子規", file:"000305/files/43537_41508.html"},
+];
+
+/* あらすじ・解説（各作品を読んで書き下ろし。ネタバレ控えめ） */
+const SUMMARIES = {
+  rashomon:"平安末期、荒廃した羅生門の下で雨宿りする下人。飢えて盗人になるか迷う彼は、楼上で死人の髪を抜く老婆と出会う。生きるための「悪」をめぐる問答の果てに、下人の心が動く。人間のエゴイズムを鋭くえぐる芥川の代表作。",
+  kumonoito:"地獄に落ちた大泥棒カンダタ。生前にただ一度、蜘蛛を助けた善行ゆえに、釈迦がそっと垂らした一本の糸。それにすがって這い上がろうとするが、後に続く亡者たちを見て思わず叫んだ一言が、彼の運命を分ける。因果と慈悲の物語。",
+  toshishun:"洛陽の若者・杜子春は、仙人の導きで大金を得ては使い果たす。やがて仙人になる修行として「何があっても声を出すな」と試され、地獄の責め苦にも耐えるが、ある光景の前で思わず声を上げてしまう。人としての情を問う説話。",
+  jigokuhen:"傲慢な天才絵師・良秀は、「地獄変」の屏風を描くため、地獄の責め苦をこの目で見せよと大殿に迫る。芸術の完成と引き換えに、彼は最も大切なものを失うことになる。芸術至上主義の狂気と業を描く傑作。",
+  yabunonaka:"藪の中で見つかった武士の死体。盗人、妻、そして死者の霊——三者の証言はことごとく食い違い、誰が真実を語っているのか分からない。「藪の中」という言葉の語源にもなった、多視点による人間心理の傑作。",
+  kappa:"精神を病んだ患者が語る、河童の国での見聞録。出産や恋愛、宗教や芸術、資本主義——あらゆる価値観を反転させた河童の世界を通して、人間社会と文明を痛烈に風刺する、芥川晩年の異色作。",
+  imogayu:"誰からも侮られる冴えない下級武士。「芋粥を飽きるほど食べてみたい」というささやかな夢が、ある日あっけなく叶えられようとしたとき、彼の心に去来したものは。人間の欲望のはかない機微を描く。",
+  hana_a:"長すぎる鼻に思い悩む僧・禅智内供。あれこれ試してついに鼻を短くすることに成功するが、周囲の反応はかえって彼を苦しめる。人の心にひそむ「傍観者の利己主義」を、軽妙な筆致で描き出す。",
+  mikan:"汽車の中、陰鬱な気分の「私」の前に座った、野暮ったい小娘。トンネルを抜けた踏切で、彼女が窓から投げたいくつかの蜜柑が、思いがけず温かい情景を生む。短くも鮮烈な余韻を残す一編。",
+  torokko:"八歳の良平は、工事現場のトロッコに憧れ、土工に混じって遠くまで押していく。夢中で進むうち、いつしか帰り道の遠さに気づいたとき、幼い心を襲う心細さと恐怖。子供の心理を精緻に描く。",
+  meros:"暴君の不信を正そうとして捕らえられたメロス。妹の結婚式のため、親友を人質に三日の猶予を得る。約束の刻限へ、増水した川も山賊も越えて走り続ける。友情と信実を高らかにうたう名作。",
+  ningen:"「恥の多い生涯を送って来ました」。人を恐れて道化を演じ、酒と女と薬に溺れ、人間の営みにどうしても馴染めぬまま破滅へ向かう葉蔵の手記。太宰文学の到達点とされる、痛切な自伝的告白。",
+  shayo:"没落した貴族の一家。病身の母、麻薬に溺れる弟・直治、そして新しい生き方のために「恋と革命」に賭けようとする娘・かず子。滅びゆく者と、なお生きようとする者を描く、戦後文学の代表作。",
+  fugaku:"御坂峠の茶屋に滞在する「私」が、富士を眺めて過ごす日々。見合いや人々との交流のなかで、月並みなはずの富士がふと心に沁みる瞬間を捉える。「富士には、月見草がよく似合う」。清々しい佳品。",
+  viyon:"放蕩無頼の詩人を夫に持つ妻。夫がしでかした金の不始末を償うため、彼女は飲み屋で働き始める。それでもしたたかに、明るく生き抜こうとする女性の視点から、戦後の混乱と人間の可笑しみを描く。",
+  joshi:"ある一日の、多感な少女の朝の目覚めから夜眠りにつくまで。揺れ動く自意識、母への複雑な思い、ささやかな喜びと嫌悪——移ろう心の動きを、みずみずしい独白体でつづった一編。",
+  kakekomi:"「申し上げます。あの人は、酷い。」——イエスを裏切ったユダが、激しい愛と憎しみを一気にまくし立てる。告発とも懺悔ともつかぬ独白を通して、裏切り者の心理を鮮烈に描き出す異色作。",
+  outo:"子だくさんの作家の家庭。父としての務めに倦み、酒場へと逃げていく「私」の、苦く重い一日。「子供より親が大事、と思いたい」。家庭人の弱さと哀しみをにじませる、太宰晩年の一編。",
+  otogi:"空襲の防空壕で、絵本を子に読み聞かせる父。その頭の中で、昔話が思いがけない物語へと膨らんでいく。「浦島さん」「カチカチ山」など誰もが知る昔話を、太宰一流の皮肉と洞察で語り直した傑作。",
+  kokoro:"「私」が鎌倉で出会った、謎めいた「先生」。その深い孤独の裏には、親友Kと一人の女性をめぐる、生涯忘れえぬ罪の記憶があった。明治の精神とエゴイズム、そして贖罪を描く漱石の代表作。",
+  neko:"「吾輩は猫である。名前はまだ無い」。中学教師・苦沙弥先生の家に住みついた猫の目を通して、明治の知識人たちの滑稽であわれな生態を風刺的につづる、諧謔と機知にみちた長編。",
+  botchan:"正義感が強く無鉄砲な江戸っ子の「坊っちゃん」が、四国の中学へ数学教師として赴任。狸だ、赤シャツだと渾名をつけた同僚たちを相手に繰り広げる痛快な騒動。歯切れのよい文体で人気の一作。",
+  sanshiro:"熊本から上京した青年・三四郎が、東京の大学生活で出会う学問、友情、そして謎めいた女性・美禰子。近代化していく都会のなかで揺れ動く、若者の淡い恋と成長を瑞々しく描く前期三部作の第一作。",
+  sorekara:"働かず親の援助で暮らす高等遊民・代助。かつて自ら友人に譲った女性・三千代への愛が再び燃え上がり、世間の道徳と自らの本心の間で、彼はついに重大な決断を迫られる。前期三部作の第二作。",
+  mon:"ひっそりと寄り添って暮らす宗助とお米の夫婦。だがその静かな平穏の陰には、人には言えぬ過去があった。心の安らぎを求めて禅寺の門をたたく宗助を描く、しみじみと静謐な前期三部作の完結作。",
+  kusamakura:"「智に働けば角が立つ」。俗世を離れて山中の温泉宿を訪れた画工が、浮世離れした美しい女性・那美と出会う。物語よりも絵画的・詩的な世界を追い求めた、漱石の唱える「非人情」の小説。",
+  yumejuya:"「こんな夢を見た」。幻想的で、どこか不気味な十の夢を連ねた掌編集。死んだ女を百年待つ話、運慶が仁王を彫り出す話——象徴とイメージに満ちた、漱石の異色作。",
+  ginga:"孤独な少年ジョバンニは、祭りの夜、親友カムパネルラとともに、銀河をゆく不思議な列車に乗る。美しくも哀しい星々の旅の果てに、彼が知る「ほんとうのさいわい」とは。賢治の代表作。",
+  chumon:"山奥で道に迷った二人の紳士が見つけた、立派な西洋料理店。「当店は注文の多い料理店です」。扉を進むごとに突きつけられる奇妙な注文——その本当の意味に、二人はやがて気づく。皮肉のきいた童話。",
+  gauche:"楽団でいつも下手だと叱られる、セロ弾きのゴーシュ。夜ごと一人で練習する彼のもとへ、猫やかっこう、狸の子らが次々と訪ねてくる。動物たちとの奇妙な交流のなかで、彼の演奏が変わっていく。",
+  matasaburo:"山あいの小さな分校に、転校してきた不思議な少年・高田三郎。子供たちは、彼こそ風の精「風の又三郎」ではないかと噂する。風とともに現れ、風とともに去っていく少年をめぐる物語。",
+  yodaka:"醜いと蔑まれ、鷹にまで名を変えろと迫られるよだか。生きるために虫を食べることにすら苦しんだ彼は、遠い空のかなたをめざして飛び続け、ついに一つの青い星となって燃える。切なくも美しい童話。",
+  donguri:"一郎のもとに届いた、山猫からの奇妙なはがき。裁判に呼ばれて山へ向かうと、どんぐりたちが「誰が一番えらいか」で大もめしていた。一郎が下したとんちのきいた名判決とは。愉快であたたかい童話。",
+  otsuberu:"強欲な地主オツベルは、迷い込んできた白い象を言葉巧みにだまし、こき使う。やがて弱り果てた白象が、仲間の象たちに助けを求めたとき——。搾取と解放を寓話的に描く。「ある牛飼いがものがたる」。",
+  budori:"冷害で家族を失った少年ブドリ。火山局で働きながら学び、飢饉に苦しむ農民たちを救うために行動する。自らを犠牲にしてでも人々の幸福を願う、賢治の理想が結晶した感動的な物語。",
+  maihime:"ドイツ留学中のエリート官吏・太田豊太郎は、貧しい踊り子エリスと恋に落ちる。だが立身出世と愛のあいだで心は激しく揺れ、彼は重い選択を迫られる。近代的自我の目覚めと、その挫折を描く名作。",
+  takasebune:"弟殺しの罪で島流しになる喜助を、高瀬舟で護送する同心・庄兵衛。ところが喜助は不思議なほど穏やかだった。その事情を聞くうちに、庄兵衛は「罪」とは何か、「安楽死」とは何かを問い始める。",
+  sansho:"人買いにさらわれ、山椒大夫のもとで奴隷として過酷に働かされる姉・安寿と弟・厨子王。弟を逃がすため、自らを犠牲にする姉。中世の説経節「さんせう太夫」を、鴎外が格調高く小説に結晶させた一編。",
+  gan:"高利貸しの妾となった娘・お玉。窓辺から日々見かける医学生・岡田に、彼女はひそかな思いを寄せる。だがその淡い恋は、ある小さな偶然によって、ついに実らぬまま終わる。明治の東京を舞台にした悲恋。",
+  lemon:"得体の知れない憂鬱に取り憑かれた「私」。ある日、果物屋で買った一個の檸檬を手に丸善へ入り、画本を高く積み上げて、その上にそっと檸檬を置く。「私」だけの奇妙な爆弾。感覚の冴えわたる名品。",
+  sakura:"「桜の樹の下には屍体が埋まっている!」——満開の桜のあまりの美しさに感じる、あの不安の正体を、屍体の幻視によって解き明かそうとする。鮮烈なイメージに貫かれた、散文詩のような短編。",
+  sangetsu:"詩人として名を成す夢に破れ、自尊心ゆえに人と交われなかった李徴。ある夜、彼は虎へと姿を変えてしまう。旧友との思わぬ再会のなかで、己の運命と「臆病な自尊心」を語る。中国故事に材をとる名作。",
+  meijin:"天下一の弓の名人になろうと志す紀昌。師のもとで厳しい修行を重ね、ついにたどり着いた究極の境地は、なんと「弓の存在すら忘れる」ことだった。技を極めた先にある「不射之射」を描く飄逸な寓話。",
+  deshi:"血気盛んな侠客・子路は、孔子に論破されてその弟子となる。師を心から敬愛しながらも、自らの信念をつらぬき、乱世を実直に生き抜いた子路の生涯。師弟の情を格調高くつづった一編。",
+  riryo:"匈奴に敗れて降伏した将軍・李陵、彼を弁護して宮刑に処された司馬遷、節を守り抜いて異郷に抑留され続けた蘇武。過酷な運命に対する三人三様の生き方を対比的に描く、中島敦の代表作。",
+  takekurabe:"吉原遊郭のほとりの町で、大人になりゆく子供たちの淡い交流。気の強い美登利と、僧の子・信如。互いに惹かれ合いながらも、それぞれの定められた道ゆえにすれ違っていく初恋を、美しくせつなく描く。",
+  nigorie:"銘酒屋で客をとって働く女・お力。彼女に入れあげて没落した男・源七との、断ち切れぬ腐れ縁。明治の世の底辺で懸命に生きる女の、やりきれない哀しみと宿命を描く。",
+  jusanya:"十三夜の月の美しい晩、嫁ぎ先での夫の冷たい仕打ちに耐えかね、離縁を願い出ようと実家に帰ってきたお関。だが親に諭され、再び戻る帰り道、偶然乗った人力車の車夫は思いがけぬ人物だった。女の宿命を描く。",
+  daraku:"「生きよ、堕ちよ」。敗戦後の混乱のなか、天皇制や武士道といった既成の道徳や美徳を否定し、人間は堕落しきることによってこそ、本当の自分自身を見いだせると説いた、戦後を象徴する評論。",
+  hakuchi:"戦時下、うらぶれた町に暮らす男・伊沢のもとへ、白痴の女が転がり込んでくる。空襲の炎のなかを、その女を連れて逃げまどう一夜を通して、人間の本能と、時代の虚無を生々しく描く。",
+  koya:"旅の若い僧が語る、飛騨の山中での怪異の一夜。道に迷った先の一軒家に住む妖しく美しい女は、言い寄る男たちを獣に変えてしまうという。幻想と妖艶が濃密に織りなす、鏡花文学の代表作。",
+  geka:"麻酔を拒み、意識のあるまま手術を受けようとする、高貴な夫人。彼女には、執刀する医師との間に、口にできぬ秘めた過去があった。手術台の一瞬に凝縮された悲恋を描く、鏡花初期の名短編。",
+  gongitsune:"いたずら好きの子狐ごんは、兵十のうなぎを盗んだ償いのつもりで、こっそり栗や松茸を届け続ける。だが兵十は、その贈り物の主がごんだとは知らないまま……。すれ違う善意の切なさを描く童話の名作。",
+  tebukuro:"寒い冬の日、母狐は子狐の片手を人間の手に変え、お金を握らせて、手袋を買いにやらせる。人間を恐れながらも、子狐が町で触れたのは意外なほどの温かさだった。母と子の情愛を描く、優しい童話。",
+  akairousoku:"人間の世界に憧れ、我が子を人間に託した人魚。娘が絵を描いた赤い蝋燭は、不思議と海の安全を守る。だが欲深い夫婦が金のために娘を売り飛ばしたとき、海は恐ろしい姿を見せる。哀しく美しい童話。",
+  tsukiyo:"静かな月夜、庭で縫い物をする年老いた女のもとを、風変わりな眼鏡売りの老人と、傷ついた小さな娘が訪れる。幻想的な出会いを通して、優しさと憐れみをそっと描いた、小川未明の抒情的な一編。",
+  hae:"夏の宿場、乗合馬車を今か今かと待つ人々。それぞれの切実な事情を抱えた乗客たちを乗せて、馬車はやがて出発するが、居眠りする馭者のもと、思わぬ結末へと向かう。一匹の蠅の視点を交えて描く新感覚派の実験作。",
+  harubasha:"病に伏す妻を看病して過ごす夫の日々。衰弱していく妻との、いらだちと深い愛情の入り混じった会話。冬の終わり、届けられた春の花とともに近づく別れの予感を、静かに見つめた一編。",
+  musashino:"かつて雑木林が一面に広がっていた武蔵野。その自然の美しさを、四季の移ろいや林を歩く記憶とともに、詩情ゆたかにつづった随筆的な小説。日本の風景美の「発見」として名高い、独歩の代表作。",
+  kanikosen:"オホーツクの荒海で蟹を獲り、船上で缶詰に加工する蟹工船・博光丸。過酷な労働と、監督のむごい仕打ちに虐げられた労働者たちが、やがて一つに団結して立ち上がる。プロレタリア文学を代表する作品。",
+  onshu:"人を殺めて逃げた男が、罪を悔いて僧となり、旅人が命を落とす難所の岸壁に、ただ一人トンネルを掘り抜く難事業へ生涯を捧げる。やがて彼を父の仇と狙う若者が現れるが……。贖罪と和解の物語。",
+  kazetachinu:"「風立ちぬ、いざ生きめやも」。高原のサナトリウムで、病の婚約者・節子に寄り添って過ごす「私」。愛する人の死を静かに受けとめながら、生きること、幸福とは何かを見つめる。堀辰雄の代表作。",
+  hitofusa:"図画の好きな少年が、級友の美しい絵具をつい盗んでしまう。露見して泣きじゃくる彼を、優しく諭してくれた女の先生。そっと差し出された一房の葡萄が胸に残る、少年の日の悔恨と救いを描く自伝的童話。",
+  chikyu:"地球をめぐる奇怪きわまる事件に、科学者たちが知恵をしぼって立ち向かう。日本SFの草分け・海野十三が放つ、スリルとユーモアにあふれた空想科学冒険譚。",
+  yoake:"「木曽路はすべて山の中である」。中山道・馬籠宿の本陣に生まれた青山半蔵。幕末から明治維新へ、時代の激動に翻弄されながら理想を追い、やがて破れていく一人の男の生涯を描く、藤村畢生の大河小説。",
+  sumida:"隅田川のほとりの下町。俳諧師の叔父のもとで暮らす少年・長吉は、芸者になってゆく幼なじみのお糸にひそかな恋心を抱く。旧き江戸情緒の残る町を背景に、報われぬ淡い恋と若者の憂愁を情緒ゆたかに描く。",
+  haguruma:"「僕」を執拗につきまとう、視界の隅にちらつく半透明の歯車の幻覚。ホテルや街をさまよいながら、迫りくる神経の崩壊と死の予感を克明に記す。芥川最晩年の、鬼気迫る自伝的作品。",
+  ahou:"芥川が自らの生涯を五十一の断章に凝縮した遺稿。「人生は一行のボオドレエルにも若かない」。芸術と狂気、家族と時代のはざまで生きた一人の作家の内面を、鋭い断片で描く。",
+  hokyonin:"長崎の教会に暮らす美しい少年信徒「ろおれんぞ」。ある罪の疑いをかけられて追放されるが、火事の夜、身を挺して示した真実が人々を打つ。切支丹物の名品。",
+  gesaku:"老いた戯作者・滝沢馬琴の一日。俗世の雑事や自己嫌悪に苛まれながらも、ついに訪れる創作の恍惚の瞬間。芸術家の苦悩と歓喜を投影した一編。",
+  butokai:"明治の鹿鳴館の夜会。フランス人将校と踊る少女・明子。華やかな一夜のときめきと、打ち上げ花火に重ねられた人生の儚さ。後年明かされる相手の正体が、静かな余韻を残す。",
+  majutsu:"インド人マティラム・ミスラから魔術を教わる「私」。ただし条件は「欲を捨てること」。大金を目の前にした一瞬の欲が、すべてを夢のように消し去る。教訓のきいた幻想譚。",
+  sarukani:"あの昔話「さるかに合戦」の後日談。仇討ちを果たした蟹たちを待っていたのは、世間の冷ややかな評価と裁判だった。寓話を借りて社会の理不尽を風刺する短編。",
+  aki:"才媛の姉・信子は、妹が想う男と知りつつ結婚し、平凡な家庭に収まる。歳月を経て再会したとき、胸をよぎる後悔と諦念。女性の心の機微を静かに描く。",
+  rokunomiya:"時代の流れに取り残された王朝の姫君。頼る男に去られ、零落していく彼女の、あまりに受け身な生。信仰にも救われぬまま消えていく命を、淡々と描く。",
+  tsugaru:"故郷・津軽を旅した太宰が、風土と人情、そして幼い頃の子守り・たけとの再会をつづる紀行文。生地への複雑な思いと、素朴な愛情がにじむ、太宰の代表的な一作。",
+  chikuken:"「私は、犬については自信がある。いつか、はうと思っている」。犬を恐れ憎む「私」が、なぜか一匹の犬になつかれてしまう顛末を、自虐とユーモアたっぷりに語る軽妙な一編。",
+  goodbye:"多くの女に手を出してきた男が、絶世の美女を「妻」と偽り、女たちに別れを告げて回る計画を立てる。太宰絶筆の未完作。洒脱な喜劇の途中で、筆は絶たれた。",
+  tokaton:"敗戦の玉音放送の直後、どこからか聞こえた「トカトントン」という金槌の音。以来、何かに打ち込もうとするたびその音が響き、すべてが虚しくなる——奇妙な手紙形式の一編。",
+  romanesque:"仙術太郎・喧嘩次郎兵衛・嘘の三郎——三人の奇人それぞれの物語が語られ、最後に一堂に会する。饒舌でとぼけた語り口の、太宰初期の諧謔にみちた寓話。",
+  gyofuku:"山中の滝のほとり、炭焼きの娘・スワ。父との暮らしや淡い思いを抱えた少女が、ある夜、滝に身を投じて鮒に化す。土俗的で幻想的な、太宰初期の短編。",
+  tokyo8:"苦難の十年を過ごした東京の、八つの風景に思い出を重ねて振り返る自伝的作品。放蕩と挫折、そして再生へ——過去の自分に決別しようとする作家の回想。",
+  higan:"大学を出たての須永が、叔父の紹介で関わる人々と出来事。探偵じみた依頼から、須永と従妹・千代子をめぐる恋の葛藤へ。短編を連ねた後期三部作の第一作。",
+  kojin:"学者の兄・一郎は、妻の心がほんとうに自分に向いているか疑い、弟に妻の貞節を試すよう頼む。知性ゆえに孤独と猜疑に苦しむ兄を、弟の目から描く。後期三部作の第二作。",
+  garasudo:"病を得た晩年の漱石が、書斎の硝子戸の内から、身辺の出来事や過ぎ去った日々の記憶を静かにつづる随筆集。穏やかな筆致に、人生への深い感慨がにじむ。",
+  buncho:"人にすすめられて飼い始めた一羽の文鳥。その愛らしい姿に心を寄せる日々と、ふとした油断がもたらす結末。小さな命を通して哀感を描く、漱石の小品。",
+  abe:"主君の死に殉じる「殉死」をめぐり、許されなかった阿部一族の悲劇。武士の意地と面目、藩の論理が絡み合い、一族はついに滅びへと突き進む。武家社会の非情を描く。",
+  saigo:"死罪となった父を救おうと、娘・いちが奉行所に嘆願する。「お上のことに間違いはございますまいから」——彼女の放った鋭い一句が、役人たちを慄然とさせる。",
+  kanzan:"唐の役人・閭丘胤が、高徳の僧と聞いて訪ねた相手は、寺で下働きをする風変わりな二人、寒山と拾得だった。名利を超えた境地を、飄々と描く掌編。",
+  moso:"海辺の家で余生を送る老人が、青年時代の留学から現在まで、生と死をめぐって抱き続けてきた思索を回想する。鴎外自身の死生観を色濃く映した随想的作品。",
+  nametoko:"熊を撃って生計を立てる猟師・小十郎。だが彼は熊を憎まず、熊もまた彼を慕う。命を奪い奪われる者の哀しみと敬意を描く、賢治の名作。",
+  tsuchigami:"美しい樺の木をめぐり、無骨な土神と、嘘つきだが洗練された狐が張り合う。嫉妬に苦しむ土神が、ある日とった行動とは。切なくも痛切な童話。",
+  hyoga:"極寒の地へ向かう列車が、氷河鼠の毛皮を大量に持つ紳士を狙う白熊たちに襲われる。動物を搾取する人間への問いを込めた、賢治の風刺的な童話。",
+  cairo:"三十匹の蛙をだまして酒を飲ませ、借金漬けにして家来にした「カイロ団長」のとのさま蛙。だが立場は思わぬ形で逆転する。搾取と改心をユーモラスに描く童話。",
+  kainohi:"ひばりの子を助けた兎のホモイは、褒美に美しい宝珠「貝の火」を授かる。だが驕り高ぶるうちに、宝珠はしだいに濁っていく。慢心への戒めを描く童話。",
+  otsugomori:"奉公先で健気に働く少女・お峰。大晦日、病の伯父のために工面したわずかな金をめぐって、盗みの疑いという窮地に立たされる。明治の貧しさと人情を描く。",
+  wakaremichi:"傘屋で働く小さな少年・吉三と、彼を弟のように可愛がる年上の娘・お京。お京が身を売る道へ進もうとする夜、二人は激しく言い争う。ゆきずれてゆく二人の別れを描く。",
+  mojika:"古代アッシリアの都。文字には霊が取り憑くのか——文字を凝視するうち意味が崩れる現象に囚われた老博士が、文字の恐ろしさを説く。知の逆説を描く中島の異色作。",
+  gojo:"『西遊記』の沙悟浄が、妖怪となる前、流沙河の底で「自分とは何か」に思い悩み、数多の賢者を訪ね歩く。答えを求めてさまよう知識人の姿を重ねた寓話。",
+  gojotan:"旅の途上、沙悟浄が、超然たる悟空、俗物ながら憎めぬ八戒、そして聖なる三蔵法師を見つめ、それぞれの生き方に感嘆し省みる。師弟四人を悟浄の目から描く。",
+  fuyunohi:"病を得た青年・堯の、冬の日々。弱った体で街を歩き、落日や風景に感覚を研ぎ澄ませる。生と死のあわいに揺れる心を、繊細な描写で捉えた一編。",
+  yaminoemaki:"病後の療養地で「私」が体験する、濃密な闇。街灯もない道の底知れぬ暗黒に、恐怖と陶酔を同時に感じる。闇そのものを主題にした散文詩的作品。",
+  aibu:"猫の耳の不思議な手ざわりへの偏愛から、猫を化粧道具にする空想まで——猫をめぐる感覚と幻想を、軽やかに綴った梶井の掌編。",
+  utaandon:"芸を捨てさせられた元・能楽師の男が、桑名の宿で、かつて自分が破滅させた按摩の娘と再会する。芸の因縁と情念が絡み合う、鏡花円熟期の名作。",
+  kusameikyu:"亡き母が歌った手毬唄を求めてさまよう青年が、迷い込んだ魔性の館。幻想と怪異が幾重にも折り重なる、鏡花の幻想文学の極致。",
+  sakuranomori:"満開の桜の下は、なぜか恐ろしい——山賊の男が、美しく残酷な女に魅入られ、その欲望に従ううちに破滅へ向かう。幻想と狂気が咲き乱れる、安吾の代表作。",
+  kazehakase:"「風博士」を名乗る奇人が、宿敵「蛸博士」への告発を叫んだ末、風となって消えてしまう——奇想天外な語りで綴られる、安吾のナンセンスな出世作。",
+  bunkashikan:"法隆寺も平等院も、なくなって困りはしない——伝統美への通念を退け、「必要」から生まれる本物の美を説く、坂口安吾の痛快な文化論。",
+  hananoki:"花のき村にやってきた五人組の盗人。だが村ののどかさと人の善良さに触れるうち、盗人の心にも変化が兆す。人の善性を信じる、新美南吉の温かな童話。",
+  nobara:"国境を接する二国。老兵と青年兵、敵味方でありながら、野ばらの咲くそばで親しく語らう二人。だが戦争が、その静かな友情を引き裂く。反戦の思いを込めた小品。",
+  cain:"北海道の小作農・広岡仁右衛門。荒々しく反抗的な男は、厳しい自然と地主制度に抗って生きようとするが、ことごとく打ちのめされていく。大地に生きる人間を描く。",
+  chisaki:"妻を亡くした父が、幼くして母を失った我が子たちへ書き遺す手紙。「お前たちの一生の旅は遠い」。深い愛と励ましを込めて、亡き妻の思い出とともに語りかける。",
+  wasureenu:"宿で出会った文学者が語る「忘れ得ぬ人々」——親しい間柄ではないのに、ふと心に浮かぶ、旅先で見かけただけの見知らぬ人たち。人生の哀愁を静かに描く名品。",
+  gyuniku:"集まった男たちの談論。現実的な「牛肉」派か、理想を追う「馬鈴薯」派か。最後に一人が語る「驚きたい」という切なる願いが、人生の本質を突く。",
+  harunotori:"城跡の町で、「私」が家庭教師をすることになった、知恵の遅れた少年・六蔵。空を飛ぶ鳥に憧れる純真な少年をめぐる、哀切な物語。",
+  kikai:"ネームプレート製造の小さな工場。薬品を扱う職人たちの、疑心と緊張の絡み合い。句読点少ない意識の流れで、人間を機械の歯車のように描く新感覚派の代表作。",
+  atama:"「真昼である。特別急行列車は満員のまま全速力で走っていた」——名高い一文で始まる、列車の乗客たちを乾いた視線で切り取った、新感覚派の実験的短編。",
+  utsukushii:"高原の避暑地・軽井沢。前年の恋の傷を抱えた「私」が、美しい村を散策しながら、新たな出会いの予感に心を開いていく。抒情ゆたかな堀辰雄の代表作。",
+  seikazoku:"敬愛する人の死をきっかけに交わる、青年と、故人ゆかりの母娘。死の影のもとで芽生える淡い愛と、繊細な心理を描く。「死があたかも一つの季節を開いた」。",
+  oshie:"病身の女ピアニストが、一人の男に宛てて綴る告白の手紙。押絵をめぐる数奇な因縁と、自らの出生の秘密が、幻想的に語られていく。夢野久作の妖しい一編。",
+  shojo:"天真爛漫な看護婦の娘が抱えた、恐ろしい嘘の習癖——三つの少女の悲劇を連ねた連作。無邪気さと狂気が背中合わせの、夢野久作の代表作。",
+  meotozenzai:"頼りない道楽者の柳吉と、しっかり者の芸者・蝶子。甲斐性のない男に尽くし、何度も商売を立て直す蝶子。大阪の下町を舞台に、可笑しくも情のある夫婦の姿を描く。",
+  futon:"妻子ある中年作家が、若い女弟子に抱く抑えがたい恋情。弟子が去った後、彼女の残した蒲団に顔をうずめて涙する——赤裸々な告白で日本自然主義を確立した問題作。",
+  ippeisotsu:"日露戦争の戦地。脚気を病んだ一人の兵士が、隊を離れて野をさまよい、誰にも看取られず息絶えていく。戦争の悲惨を、一兵卒の孤独な死を通して描く。",
+  ukigumo:"免職になった生真面目な青年・文三。同居する叔母の家で、従妹・お勢への恋も、世渡り上手な同僚に奪われそうになる。言文一致で書かれた、日本近代小説の嚆矢。",
+  gojunoto:"腕はよいが不器用で「のっそり」と呼ばれる大工・十兵衛。恩ある親方を差し置いてでも、五重塔の建立に己のすべてを賭ける。職人の芸術家魂を格調高く描く名作。",
+  konjiki:"許婚のお宮を、富豪に奪われた学生・間貫一。「来年の今月今夜……」熱海の海岸での名場面を経て、彼は復讐に燃える高利貸しへと身を落とす。明治の大ベストセラー。",
+  younenjidai:"寺に養子として育った少年の、金沢での幼い日々。義母や周囲との関わり、生い立ちの寂しさを、詩人らしい繊細な筆致で回想する自伝的作品。",
+  nekomachi:"方向感覚を失ったとき、見慣れた町の裏側に「別の世界」が現れる——散歩の果てに迷い込んだ町で、「私」は突然、無数の猫が満ちる異様な光景を目にする。詩人の幻想散文。",
+  cement:"セメント樽の中から出てきた一枚の手紙。それは、恋人を工場の機械で失い、その遺骨がセメントに混じったと訴える女工のものだった。労働者の悲哀を描くプロレタリア文学の名品。",
+  byosho:"「病牀六尺、これが我世界である」。脊椎カリエスで寝たきりとなった子規が、死の直前まで書きつづった随筆。病苦のなかでも失われない鋭い観察眼と、生への強い意欲がにじむ。",
+};
+
+/* 各作品の実測メタ（本文を取得して計測）: min=読了目安(分) diff=難易度1-5 beginner=はじめて向き */
+const META = {"rashomon":{"min":13,"diff":2,"beginner":true},"kumonoito":{"min":6,"diff":2,"beginner":true},"toshishun":{"min":20,"diff":3,"beginner":false},"jigokuhen":{"min":59,"diff":5,"beginner":false},"yabunonaka":{"min":19,"diff":1,"beginner":true},"kappa":{"min":83,"diff":1,"beginner":false},"imogayu":{"min":32,"diff":3,"beginner":false},"hana_a":{"min":13,"diff":2,"beginner":true},"mikan":{"min":7,"diff":4,"beginner":false},"torokko":{"min":10,"diff":2,"beginner":true},"meros":{"min":22,"diff":1,"beginner":true},"ningen":{"min":161,"diff":2,"beginner":false},"shayo":{"min":197,"diff":1,"beginner":false},"fugaku":{"min":33,"diff":2,"beginner":false},"viyon":{"min":45,"diff":2,"beginner":false},"joshi":{"min":69,"diff":1,"beginner":false},"kakekomi":{"min":30,"diff":1,"beginner":false},"outo":{"min":11,"diff":1,"beginner":true},"otogi":{"min":157,"diff":4,"beginner":false},"kokoro":{"min":356,"diff":2,"beginner":false},"neko":{"min":708,"diff":2,"beginner":false},"botchan":{"min":196,"diff":2,"beginner":false},"sanshiro":{"min":354,"diff":4,"beginner":false},"sorekara":{"min":382,"diff":2,"beginner":false},"mon":{"min":299,"diff":5,"beginner":false},"kusamakura":{"min":187,"diff":2,"beginner":false},"yumejuya":{"min":35,"diff":2,"beginner":false},"ginga":{"min":85,"diff":1,"beginner":false},"chumon":{"min":12,"diff":1,"beginner":true},"gauche":{"min":26,"diff":1,"beginner":false},"matasaburo":{"min":67,"diff":1,"beginner":false},"yodaka":{"min":11,"diff":1,"beginner":true},"donguri":{"min":14,"diff":2,"beginner":false},"otsuberu":{"min":13,"diff":1,"beginner":true},"budori":{"min":56,"diff":1,"beginner":false},"maihime":{"min":34,"diff":5,"beginner":false},"takasebune":{"min":19,"diff":5,"beginner":false},"sansho":{"min":49,"diff":1,"beginner":false},"gan":{"min":163,"diff":2,"beginner":false},"lemon":{"min":11,"diff":2,"beginner":true},"sakura":{"min":4,"diff":1,"beginner":true},"sangetsu":{"min":13,"diff":2,"beginner":true},"meijin":{"min":12,"diff":5,"beginner":false},"deshi":{"min":53,"diff":2,"beginner":false},"riryo":{"min":75,"diff":3,"beginner":false},"takekurabe":{"min":64,"diff":5,"beginner":false},"nigorie":{"min":45,"diff":4,"beginner":false},"jusanya":{"min":28,"diff":5,"beginner":false},"daraku":{"min":17,"diff":3,"beginner":false},"hakuchi":{"min":51,"diff":3,"beginner":false},"koya":{"min":77,"diff":4,"beginner":false},"geka":{"min":16,"diff":2,"beginner":true},"gongitsune":{"min":11,"diff":1,"beginner":true},"tebukuro":{"min":8,"diff":1,"beginner":true},"akairousoku":{"min":14,"diff":1,"beginner":true},"tsukiyo":{"min":8,"diff":1,"beginner":true},"hae":{"min":8,"diff":2,"beginner":true},"harubasha":{"min":24,"diff":1,"beginner":false},"musashino":{"min":34,"diff":3,"beginner":false},"kanikosen":{"min":136,"diff":1,"beginner":false},"onshu":{"min":50,"diff":2,"beginner":false},"kazetachinu":{"min":121,"diff":2,"beginner":false},"hitofusa":{"min":14,"diff":1,"beginner":true},"chikyu":{"min":185,"diff":2,"beginner":false},"yoake":{"min":455,"diff":3,"beginner":false},"sumida":{"min":77,"diff":3,"beginner":false},"haguruma":{"min":56,"diff":3,"beginner":false},"ahou":{"min":27,"diff":3,"beginner":false},"hokyonin":{"min":21,"diff":3,"beginner":false},"gesaku":{"min":46,"diff":1,"beginner":false},"butokai":{"min":11,"diff":4,"beginner":false},"majutsu":{"min":16,"diff":2,"beginner":true},"sarukani":{"min":5,"diff":3,"beginner":false},"aki":{"min":25,"diff":3,"beginner":false},"rokunomiya":{"min":13,"diff":3,"beginner":false},"tsugaru":{"min":247,"diff":3,"beginner":false},"chikuken":{"min":27,"diff":1,"beginner":false},"goodbye":{"min":33,"diff":1,"beginner":false},"tokaton":{"min":28,"diff":2,"beginner":false},"romanesque":{"min":41,"diff":1,"beginner":false},"gyofuku":{"min":11,"diff":1,"beginner":true},"tokyo8":{"min":46,"diff":2,"beginner":false},"higan":{"min":433,"diff":3,"beginner":false},"kojin":{"min":493,"diff":2,"beginner":false},"garasudo":{"min":116,"diff":2,"beginner":false},"buncho":{"min":23,"diff":2,"beginner":false},"abe":{"min":61,"diff":3,"beginner":false},"saigo":{"min":20,"diff":5,"beginner":false},"kanzan":{"min":13,"diff":4,"beginner":false},"moso":{"min":30,"diff":3,"beginner":false},"nametoko":{"min":16,"diff":1,"beginner":true},"tsuchigami":{"min":21,"diff":1,"beginner":true},"hyoga":{"min":13,"diff":2,"beginner":false},"cairo":{"min":21,"diff":1,"beginner":true},"kainohi":{"min":32,"diff":1,"beginner":false},"otsugomori":{"min":22,"diff":5,"beginner":false},"wakaremichi":{"min":15,"diff":5,"beginner":false},"mojika":{"min":14,"diff":2,"beginner":true},"gojo":{"min":42,"diff":2,"beginner":false},"gojotan":{"min":28,"diff":2,"beginner":false},"fuyunohi":{"min":24,"diff":2,"beginner":false},"yaminoemaki":{"min":8,"diff":1,"beginner":true},"aibu":{"min":6,"diff":1,"beginner":true},"utaandon":{"min":79,"diff":2,"beginner":false},"kusameikyu":{"min":157,"diff":2,"beginner":false},"sakuranomori":{"min":37,"diff":1,"beginner":false},"kazehakase":{"min":12,"diff":2,"beginner":true},"bunkashikan":{"min":48,"diff":3,"beginner":false},"hananoki":{"min":21,"diff":1,"beginner":true},"nobara":{"min":5,"diff":1,"beginner":true},"cain":{"min":71,"diff":2,"beginner":false},"chisaki":{"min":22,"diff":2,"beginner":false},"wasureenu":{"min":21,"diff":2,"beginner":true},"gyuniku":{"min":35,"diff":3,"beginner":false},"harunotori":{"min":17,"diff":2,"beginner":true},"kikai":{"min":48,"diff":3,"beginner":false},"atama":{"min":6,"diff":3,"beginner":false},"utsukushii":{"min":95,"diff":2,"beginner":false},"seikazoku":{"min":35,"diff":2,"beginner":false},"oshie":{"min":130,"diff":3,"beginner":false},"shojo":{"min":232,"diff":3,"beginner":false},"meotozenzai":{"min":68,"diff":3,"beginner":false},"futon":{"min":99,"diff":3,"beginner":false},"ippeisotsu":{"min":25,"diff":2,"beginner":false},"ukigumo":{"min":251,"diff":3,"beginner":false},"gojunoto":{"min":125,"diff":3,"beginner":false},"konjiki":{"min":557,"diff":4,"beginner":false},"younenjidai":{"min":68,"diff":1,"beginner":false},"nekomachi":{"min":23,"diff":3,"beginner":false},"cement":{"min":6,"diff":1,"beginner":true},"byosho":{"min":194,"diff":4,"beginner":false}};
+const DIFF_LABEL = {1:"やさしい",2:"気軽",3:"標準",4:"手ごたえ",5:"難しい"};
+function diffMark(d){ let s=""; for(let i=1;i<=5;i++) s+=`<span class="${i<=d?'f':'e'}">●</span>`; return s; }        // 難易度は●
+function diffInline(d){ let s=""; for(let i=1;i<=5;i++) s+=`<span style="color:${i<=d?'#6f8fb0':'var(--line)'}">●</span>`; return s; }
+function reviewStars(n){ let s=""; for(let i=1;i<=5;i++) s+=`<span class="${i<=n?'on':'off'}">★</span>`; return s; } // レビューは★
+function fmtTime(m){ return m<90 ? m+"分" : "約"+Math.round(m/60)+"時間"; }
+function lenLabel(m){ return m<20?"短い": m<75?"ふつう": m<200?"長め":"長編"; }
+
+/* ---------- settings (localStorage) ---------- */
+const DEF_SETTINGS = { theme:"washi", size:22, openaiKey:"", chatModel:"gpt-4o-mini" };
+let settings = load("shiori.settings", DEF_SETTINGS);
+// 本棚: id -> {fraction, updated, checked, rating, review, reviewDate}
+let shelf = load("shiori.shelf", {});
+
+function load(k,def){ try{ return {...def, ...JSON.parse(localStorage.getItem(k)||"{}")}; }catch(e){ return {...def}; } }
+function save(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+function saveShelf(){ save("shiori.shelf", shelf); }
+function rec(id){ return shelf[id] || (shelf[id] = {fraction:0}); }
+// 旧 shiori.bookmarks からの移行
+(function migrateBookmarks(){
+  if(Object.keys(shelf).length) return;
+  try{
+    const old = JSON.parse(localStorage.getItem("shiori.bookmarks")||"{}");
+    let n=0; for(const id in old){ shelf[id] = {fraction:old[id].fraction||0, updated:old[id].updated}; n++; }
+    if(n) saveShelf();
+  }catch(e){}
+})();
+const STATUS_LABEL = {unread:"未読", reading:"読書中", done:"読了"};
+function statusOf(id){
+  const r = shelf[id]; if(!r) return "unread";
+  if(r.rating) return "done";
+  if((r.fraction||0) >= 0.95) return "done";
+  if((r.fraction||0) > 0.005) return "reading";
+  return "unread";
+}
+function saveSettings(){ save("shiori.settings", settings); applyTheme(); }
+function applyTheme(){
+  document.body.dataset.theme = settings.theme;
+  document.documentElement.style.setProperty("--reader-size", settings.size+"px");
+}
+
+/* ---------- reader state ---------- */
+let cur = { work:null, pages:1, page:0, pageWidth:0, colPitch:0, plainText:"" };
+
+/* =========================================================
+   LIBRARY
+   ========================================================= */
+let libSort = "author", libBeginnerOnly = false, libCheckedOnly = false, libStatus = "all";
+function setSort(v){ libSort = v; renderLibrary(); }
+function setStatusFilter(v){ libStatus = v; renderLibrary(); }
+function toggleBeginner(){
+  libBeginnerOnly = !libBeginnerOnly;
+  document.getElementById("begBtn").classList.toggle("on", libBeginnerOnly);
+  renderLibrary();
+}
+function toggleChecked(){
+  libCheckedOnly = !libCheckedOnly;
+  document.getElementById("checkBtn").classList.toggle("on", libCheckedOnly);
+  renderLibrary();
+}
+function toggleCheck(ev, id){
+  ev.stopPropagation();
+  const r = rec(id); r.checked = !r.checked; saveShelf(); renderLibrary();
+}
+function toggleCheckReader(){   // 読書画面から「気になる」登録
+  if(!cur.work) return;
+  const r = rec(cur.work.id); r.checked = !r.checked; saveShelf();
+  document.getElementById("btn-check").classList.toggle("active", r.checked);
+}
+function lastActivity(id){ const r=shelf[id]; return r ? (r.reviewDate||r.updated||"") : ""; }
+function renderLibrary(){
+  const q = (document.getElementById("searchInput").value||"").trim().toLowerCase();
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  const m = id => META[id] || {min:0,diff:0,beginner:false};
+  let list = WORKS.filter(w => !q || (w.title+w.author).toLowerCase().includes(q));
+  if(libBeginnerOnly) list = list.filter(w => m(w.id).beginner);
+  if(libCheckedOnly)  list = list.filter(w => shelf[w.id] && shelf[w.id].checked);
+  if(libStatus!=="all") list = list.filter(w => statusOf(w.id)===libStatus);
+
+  const grouped = (!q && libSort==="author" && libStatus==="all" && !libBeginnerOnly && !libCheckedOnly);
+  if(libSort==="easy")       list = [...list].sort((a,b)=> m(a.id).diff-m(b.id).diff || m(a.id).min-m(b.id).min);
+  else if(libSort==="short") list = [...list].sort((a,b)=> m(a.id).min-m(b.id).min);
+  else if(libSort==="reco")  list = [...list].sort((a,b)=>
+      (m(b.id).beginner-m(a.id).beginner) || (m(a.id).diff-m(b.id).diff) || (m(a.id).min-m(b.id).min));
+  else if(libSort==="rating")list = [...list].sort((a,b)=> ((shelf[b.id]&&shelf[b.id].rating)||0)-((shelf[a.id]&&shelf[a.id].rating)||0));
+  else if(libSort==="recent")list = [...list].sort((a,b)=> lastActivity(b.id).localeCompare(lastActivity(a.id)));
+
+  const parts = [];
+  if(libBeginnerOnly) parts.push("はじめての一冊");
+  if(libCheckedOnly)  parts.push("気になる");
+  if(libStatus!=="all") parts.push(STATUS_LABEL[libStatus]);
+  document.getElementById("libCount").textContent = q
+    ? `${list.length} 作品がヒット`
+    : (parts.length ? parts.join(" ・ ")+` ・ ${list.length} 作品` : `全 ${WORKS.length} 作品を収録`);
+
+  if(list.length===0){
+    grid.innerHTML = `<div style="grid-column:1/-1;color:var(--sub);padding:34px 4px">該当する作品がありません。</div>`;
+    return;
+  }
+
+  let lastAuthor = null;
+  list.forEach(w=>{
+    if(grouped && w.author !== lastAuthor){
+      const h = document.createElement("div");
+      h.className = "author-head"; h.textContent = w.author;
+      grid.appendChild(h); lastAuthor = w.author;
+    }
+    const md = m(w.id), r = shelf[w.id] || {}, st = statusOf(w.id);
+    const pct = Math.round((r.fraction||0)*100);
+    const statusText = st==="unread" ? "未読" : st==="reading" ? `読書中 ${pct}%` : "読了";
+    const c = document.createElement("div");
+    c.className = "card";
+    c.innerHTML =
+      `<span class="spine"></span>` +
+      `<button class="checkbtn ${r.checked?'on':''}" title="気になる（あとで読む）に登録" onclick="toggleCheck(event,'${w.id}')">🔖<span>${r.checked?'気になる済':'気になる'}</span></button>` +
+      `<div class="vtitle">${w.title}</div>` +
+      `<div class="author">${w.author}</div>` +
+      `<div class="meta">` +
+        `<span class="diffm" title="難易度：${DIFF_LABEL[md.diff]||"—"}">難 ${diffMark(md.diff)}</span>` +
+        `<span class="rt">⏱ ${fmtTime(md.min)}</span>` +
+        (md.beginner ? `<span class="btag">はじめて</span>` : ``) +
+      `</div>` +
+      `<div class="statusline">` +
+        `<span class="stt ${st}">${statusText}</span>` +
+        (r.rating ? `<span class="rev-stars" title="あなたの評価">${reviewStars(r.rating)}</span>` : ``) +
+      `</div>`;
+    c.onclick = ()=> openWork(w);
+    grid.appendChild(c);
+  });
+}
+
+/* ---------- レビュー ---------- */
+let tmpRating = 0;
+function openReview(id){
+  if(!id) return;
+  const w = WORKS.find(x=>x.id===id); if(!w) return;
+  const r = rec(id); tmpRating = r.rating||0;
+  document.getElementById("finishToast")?.classList.add("hidden");
+  const scrim = document.createElement("div");
+  scrim.className = "scrim center"; scrim.onclick=(e)=>{ if(e.target===scrim) scrim.remove(); };
+  scrim.innerHTML = `
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="dhead"><h3>📝 レビュー</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
+      <div class="dbody">
+        <div class="note" style="margin-bottom:14px">${w.title} / ${w.author}</div>
+        <div class="field"><label>評価（星）</label><div class="rate" id="rateRow"></div></div>
+        <div class="field"><label>感想・メモ（任意）</label>
+          <textarea id="reviewText" rows="5" placeholder="心に残った場面、読んだ感想など">${escapeHtml(r.review||"")}</textarea></div>
+        <button class="btn-primary" onclick="saveReview('${id}',this)">保存する</button>
+        ${r.rating ? `<button class="btn-ghost" style="margin-top:8px" onclick="deleteReview('${id}',this)">レビューを削除</button>` : ``}
+      </div>
+    </div>`;
+  document.body.appendChild(scrim);
+  renderRate();
+}
+function renderRate(){
+  const row = document.getElementById("rateRow"); if(!row) return;
+  row.innerHTML = "";
+  for(let i=1;i<=5;i++){
+    const b = document.createElement("button");
+    b.className = "star-btn"+(i<=tmpRating?" on":"");
+    b.textContent = "★"; b.onclick = ()=>{ tmpRating = i; renderRate(); };
+    row.appendChild(b);
+  }
+  const lab = document.createElement("span");
+  lab.className = "rate-label";
+  lab.textContent = ["未評価","いまひとつ","まあまあ","良い","とても良い","傑作"][tmpRating] || "";
+  row.appendChild(lab);
+}
+function saveReview(id, btn){
+  const r = rec(id);
+  r.rating = tmpRating;
+  r.review = document.getElementById("reviewText").value.trim();
+  r.reviewDate = isoNow();
+  saveShelf();
+  btn.textContent = "保存しました ✓";
+  setTimeout(()=>{ btn.closest(".scrim").remove(); renderLibrary(); }, 650);
+}
+function deleteReview(id, btn){
+  const r = rec(id); delete r.rating; delete r.review; delete r.reviewDate;
+  saveShelf(); btn.closest(".scrim").remove(); renderLibrary();
+}
+function showLibrary(){
+  document.getElementById("reader").classList.add("hidden");
+  document.getElementById("library").classList.remove("hidden");
+  document.getElementById("btn-dict").hidden = true;
+  document.getElementById("btn-summary").hidden = true;
+  document.getElementById("btn-check").hidden = true;
+  document.getElementById("btn-review").hidden = true;
+  document.getElementById("btn-ruby").hidden = true;
+  document.getElementById("finishToast").classList.add("hidden");
+  renderLibrary();
+}
+
+/* =========================================================
+   OPEN + PARSE A WORK
+   ========================================================= */
+async function openWork(w){
+  cur.work = w;
+  document.getElementById("library").classList.add("hidden");
+  document.getElementById("reader").classList.remove("hidden");
+  document.getElementById("btn-dict").hidden = false;
+  document.getElementById("btn-summary").hidden = false;
+  document.getElementById("btn-check").hidden = false;
+  document.getElementById("btn-review").hidden = false;
+  document.getElementById("btn-ruby").hidden = false;
+  document.getElementById("btn-check").classList.toggle("active", !!(shelf[w.id] && shelf[w.id].checked));
+  document.getElementById("finishToast").classList.add("hidden");
+  reviewPrompted = false;
+  document.getElementById("readTitle").textContent = `${w.title} — ${w.author}`;
+  const loading = document.getElementById("readerLoading");
+  const book = document.getElementById("book");
+  book.innerHTML = ""; loading.classList.remove("hidden"); setLoadingMsg("本を開いています…");
+
+  try{
+    const url = RAW + w.file;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const buf = await res.arrayBuffer();
+    const html = new TextDecoder("shift_jis").decode(buf);
+    const doc = new DOMParser().parseFromString(html, "text/html");
+
+    // resolve relative image (gaiji) URLs to absolute
+    doc.querySelectorAll("img").forEach(img=>{
+      const src = img.getAttribute("src");
+      if(src) img.setAttribute("src", new URL(src, url).href);
+    });
+
+    const main = doc.querySelector(".main_text");
+    const titleEl = doc.querySelector(".title");
+    const authorEl = doc.querySelector(".author");
+    const frag = document.createElement("div");
+    if(titleEl){ const h=document.createElement("h1"); h.className="title"; h.textContent=titleEl.textContent; frag.appendChild(h); }
+    if(authorEl){ const h=document.createElement("h2"); h.className="author"; h.textContent=authorEl.textContent; frag.appendChild(h); }
+    if(main){ frag.appendChild(main); }
+    else { frag.appendChild(doc.body); }
+
+    book.innerHTML = frag.innerHTML;
+    cur.plainText = (main? main.textContent : frag.textContent).replace(/\s+/g," ").trim();
+    cur.baseHTML = book.innerHTML;   // ふりがな適用前のHTML（OFFで復元）
+    cur.rubyOn = false;
+    document.getElementById("btn-ruby").classList.remove("active");
+
+    await (document.fonts ? document.fonts.ready : Promise.resolve());
+    loading.classList.add("hidden");
+    requestAnimationFrame(()=>{
+      paginate();
+      const r = shelf[w.id];
+      goToFraction(r ? (r.fraction||0) : 0, false);
+    });
+  }catch(err){
+    loading.classList.add("hidden");
+    book.innerHTML = `<div style="writing-mode:horizontal-tb;color:var(--sub);line-height:2;max-width:60ch">`+
+      `本文を取得できませんでした。<br>ネットワーク接続、または通信のブロック（拡張機能等）をご確認ください。<br><br>`+
+      `<span style="font-size:12px">${(err&&err.message)||err}</span></div>`;
+  }
+}
+
+/* =========================================================
+   VERTICAL PAGINATION
+   ========================================================= */
+function paginate(){
+  const stage = document.getElementById("stage");
+  const book = document.getElementById("book");
+  const csBook = getComputedStyle(book);
+  const rightGap = parseFloat(csBook.right)||0;
+  const leftGap  = 8;
+  const avail = stage.clientWidth - rightGap - leftGap;
+  let pitch = parseFloat(csBook.lineHeight);
+  if(!pitch || isNaN(pitch)) pitch = parseFloat(csBook.fontSize)*2;
+  const colsPerPage = Math.max(1, Math.floor(avail / pitch));
+  cur.colPitch = pitch;
+  cur.pageWidth = colsPerPage * pitch;
+  const total = book.scrollWidth;
+  cur.pages = Math.max(1, Math.ceil(total / cur.pageWidth));
+  applyPage();
+}
+function applyPage(animate=true){
+  const book = document.getElementById("book");
+  if(!animate) book.style.transition = "none";
+  book.style.transform = `translateX(${cur.page * cur.pageWidth}px)`;
+  if(!animate) requestAnimationFrame(()=> book.style.transition = "");
+  const frac = cur.pages>1 ? cur.page/(cur.pages-1) : 0;
+  document.getElementById("progBar").style.width = (frac*100)+"%";
+  document.getElementById("pageNo").textContent = `🔖 ${cur.page+1}/${cur.pages}・${Math.round(frac*100)}%`;
+  if(cur.work){
+    const r = rec(cur.work.id);
+    r.fraction = frac; r.updated = isoNow();
+    saveShelf();
+    // 最終ページに到達したら（まだレビュー未記入なら）そっと促す
+    if(cur.pages>1 && cur.page===cur.pages-1 && !r.rating) maybePromptReview();
+  }
+}
+let reviewPrompted = false;
+function maybePromptReview(){
+  if(reviewPrompted) return; reviewPrompted = true;
+  const t = document.getElementById("finishToast");
+  if(t){ t.classList.remove("hidden"); }
+}
+function turn(dir){
+  const next = cur.page + dir;
+  if(next<0 || next>=cur.pages) return;
+  cur.page = next; applyPage();
+}
+function goToFraction(frac, animate=true){
+  cur.page = Math.round(frac * Math.max(0,(cur.pages-1)));
+  cur.page = Math.min(Math.max(cur.page,0), cur.pages-1);
+  applyPage(animate);
+}
+function seekProgress(ev){
+  const box = ev.currentTarget.getBoundingClientRect();
+  const frac = (ev.clientX - box.left)/box.width;
+  goToFraction(frac);
+}
+function isoNow(){ return new Date().toISOString().slice(0,10); }
+function setLoadingMsg(m){ const el=document.getElementById("readerLoadingMsg"); if(el) el.textContent=m; }
+
+let rzTimer;
+window.addEventListener("resize", ()=>{
+  if(document.getElementById("reader").classList.contains("hidden")) return;
+  clearTimeout(rzTimer);
+  const frac = cur.pages>1 ? cur.page/(cur.pages-1):0;
+  rzTimer = setTimeout(()=>{ paginate(); goToFraction(frac,false); }, 160);
+});
+
+document.addEventListener("keydown", e=>{
+  if(document.getElementById("reader").classList.contains("hidden")) return;
+  if(["ArrowLeft","ArrowDown","PageDown"," "].includes(e.key)){ turn(1); e.preventDefault(); }
+  else if(["ArrowRight","ArrowUp","PageUp"].includes(e.key)){ turn(-1); e.preventDefault(); }
+  else if(e.key==="Escape"){ showLibrary(); }
+});
+let wheelLock=false;
+document.getElementById("stage").addEventListener("wheel", e=>{
+  e.preventDefault();
+  if(wheelLock) return; wheelLock=true; setTimeout(()=>wheelLock=false,220);
+  turn((e.deltaY||e.deltaX) > 0 ? 1 : -1);
+},{passive:false});
+let touchX=null;
+document.getElementById("stage").addEventListener("touchstart",e=>{ touchX=e.touches[0].clientX; },{passive:true});
+document.getElementById("stage").addEventListener("touchend",e=>{
+  if(touchX==null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  // 縦書きは右→左送り: 右へスワイプ=次ページ / 左へスワイプ=前ページ
+  if(Math.abs(dx)>40) turn(dx>0 ? 1 : -1);
+  touchX=null;
+});
+
+/* =========================================================
+   TEXT SELECTION -> word explanation
+   ========================================================= */
+document.addEventListener("selectionchange", ()=>{
+  const tip = document.getElementById("seltip");
+  const sel = document.getSelection();
+  const book = document.getElementById("book");
+  if(!sel || sel.isCollapsed || document.getElementById("reader").classList.contains("hidden")){ tip.classList.add("hidden"); return; }
+  const text = sel.toString().trim();
+  if(!text || text.length>40 || !book.contains(sel.anchorNode)){ tip.classList.add("hidden"); return; }
+  const r = sel.getRangeAt(0).getBoundingClientRect();
+  tip.style.left = (r.left + r.width/2)+"px";
+  tip.style.top = r.top+"px";
+  tip.classList.remove("hidden");
+});
+function currentSelectionText(){ const s=document.getSelection(); return s? s.toString().trim():""; }
+
+/* =========================================================
+   EMOTION 演出
+   ========================================================= */
+const EMOTIONS = {
+  joy:  {label:"喜", color:"#e0a63d", tint:"rgba(224,166,61,.10)", chord:[261.6,329.6,392.0]},
+  sorrow:{label:"哀", color:"#5b7fb0", tint:"rgba(91,127,176,.12)", chord:[220.0,261.6,329.6]},
+  anger:{label:"怒", color:"#b8483a", tint:"rgba(184,72,58,.11)",  chord:[196.0,233.1,293.7]},
+  fear: {label:"恐", color:"#6c5b8a", tint:"rgba(108,91,138,.14)", chord:[174.6,207.7,246.9]},
+  calm: {label:"静", color:"#6f8f74", tint:"rgba(111,143,116,.10)",chord:[261.6,392.0,523.3]},
+};
+const EMO_WORDS = {
+  joy:["笑","嬉","喜","楽し","幸","微笑","歓","朗","晴れやか"],
+  sorrow:["涙","泣","悲","寂","哀","淋","孤","嘆","別れ","切な"],
+  anger:["怒","憤","睨","叫","罵","憎","苛","激し","怒鳴"],
+  fear:["恐","怖","慄","闇","血","震","悲鳴","死骸","戦慄","不気味","呪"],
+  calm:["静","穏","眠","夜","月","風","雪","水","空","佇","漂"],
+};
+function visiblePageText(){
+  const t = cur.plainText || "";
+  if(!t) return "";
+  const per = Math.max(400, Math.ceil(t.length / Math.max(1,cur.pages)));
+  const start = Math.floor((cur.page/Math.max(1,cur.pages)) * t.length);
+  return t.slice(start, start+Math.floor(per*1.4));
+}
+function analyzeEmotion(text){
+  let best="calm", bestN=0;
+  for(const k in EMO_WORDS){
+    let n=0; EMO_WORDS[k].forEach(w=>{ let i=0; while((i=text.indexOf(w,i))>=0){n++;i+=w.length;} });
+    if(n>bestN){ bestN=n; best=k; }
+  }
+  return {key:best, score:bestN};
+}
+
+/* =========================================================
+   総ルビ（全漢字にふりがな） — kuromoji.js を必要時にCDNから読み込み
+   ========================================================= */
+function katToHira(s){ return s.replace(/[ァ-ヶ]/g, c=>String.fromCharCode(c.charCodeAt(0)-0x60)); }
+function hasKanji(s){ return /[一-鿿㐀-䶿々]/.test(s); }
+const sleep0 = ()=> new Promise(r=>setTimeout(r,0));
+const KUROMOJI_BASE = "https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/";
+/* 教育漢字1006字（小学校で習う漢字）。これ以外の漢字を含む語だけにふりがなを付ける */
+const EASY_KANJI = new Set("一七三上下中九二五人休先入八六円出力十千口右名四土夕大天女子字学小山川左年手文日早月木本村林校森正気水火犬玉王生田男町白百目石空立竹糸耳花草虫見貝赤足車金雨青音万丸交京今会体何作元兄光公内冬刀分切前北午半南原友古台合同回図国園地場声売夏外多夜太妹姉室家寺少岩工市帰広店弓引弟弱強当形後心思戸才教数新方明星春昼時晴曜書朝来東楽歌止歩母毎毛池汽活海点父牛理用画番直矢知社秋科答算米紙細組絵線羽考聞肉自船色茶行西親角言計記話語読谷買走近通週道遠里野長門間雪雲電頭顔風食首馬高魚鳥鳴麦黄黒丁世両主乗予事仕他代住使係倍全具写列助勉動勝化区医去反取受号向君味命和品員商問坂央始委守安定実客宮宿寒対局屋岸島州帳平幸度庫庭式役待急息悪悲想意感所打投拾持指放整旅族昔昭暑暗曲有服期板柱根植業様横橋次歯死氷決油波注泳洋流消深温港湖湯漢炭物球由申界畑病発登皮皿相県真着短研礼神祭福秒究章童笛第筆等箱級終緑練羊美習者育苦荷落葉薬血表詩調談豆負起路身転軽農返追送速進遊運部都配酒重鉄銀開院陽階集面題飲館駅鼻不争付令以仲伝位低例便信倉候借停健側働億兆児共兵典冷初別利刷副功加努労勇包卒協単博印参史司各告周唱喜器囲固型堂塩士変夫失好季孫完官害察巣差希席帯底府康建径徒得必念愛成戦折挙改救敗散料旗昨景最望未末札材束松果栄案梅械極標機欠歴残殺毒氏民求治法泣浅浴清満漁灯無然焼照熱牧特産的省祝票種積競笑管節粉紀約結給続置老胃脈腸臣航良芸芽英菜街衣要覚観訓試説課議象貨貯費賞軍輪辞辺連達選郡量録鏡関陸隊静順願類飛飯養験久仏仮件任似余価保修俵個備像再刊判制券則効務勢厚句可営因団圧在均基報境墓増夢妻婦容寄富導居属布師常幹序弁張往復徳志応快性恩情態慣承技招授採接提損支政故敵断旧易暴条枝査格桜検構武比永河液混減測準演潔災燃版犯状独率現留略益眼破確示祖禁移程税築精素経統絶綿総編績織罪群義耕職肥能興舌舎術衛製複規解設許証評講謝識護豊財貧責貸貿賀資賛質輸述迷退逆造過適酸鉱銅銭防限険際雑非預領額飼並乱乳亡仁供俳値傷優党冊処刻割創劇勤危卵厳収后否吸呼善困垂城域奏奮姿存孝宅宇宗宙宝宣密寸専射将尊就尺届展層己巻幕干幼庁座延律従忘忠憲我批担拝拡捨探推揮操敬映晩暖暮朗机枚染株棒模権樹欲段沿泉洗派済源潮激灰熟片班異疑痛皇盛盟看砂磁私秘穀穴窓筋策簡糖系紅納純絹縦縮署翌聖肺背胸脳腹臓臨至若著蒸蔵蚕衆裁装裏補視覧討訪訳詞誌認誕誠誤論諸警貴賃遺郵郷針鋼閉閣降陛除障難革頂骨々");
+function isKanjiChar(c){ return /[一-鿿㐀-䶿]/.test(c); }
+function hasDifficultKanji(s){ for(const c of s){ if(isKanjiChar(c) && !EASY_KANJI.has(c)) return true; } return false; }
+
+/* --- 形態素解析は Web Worker（別スレッド）で回す：iPhoneでも本体UIが固まらない --- */
+let rubyWorker=null, rubyWorkerReady=null, rubyReqSeq=0, rubyPending={};
+function getRubyWorker(){
+  if(rubyWorkerReady) return rubyWorkerReady;
+  rubyWorkerReady = new Promise((resolve, reject)=>{
+    try{
+      const code =
+        'var TOK=null;'+
+        'importScripts(' + JSON.stringify(KUROMOJI_BASE+"build/kuromoji.js") + ');'+
+        'kuromoji.builder({dicPath:' + JSON.stringify(KUROMOJI_BASE+"dict/") + '}).build(function(err,tok){'+
+        '  if(err){ postMessage({type:"ready",ok:false,err:String(err)}); return; }'+
+        '  TOK=tok; postMessage({type:"ready",ok:true});'+
+        '});'+
+        'onmessage=function(e){'+
+        '  var d=e.data;'+
+        '  var out=d.texts.map(function(t){'+
+        '    try{ return TOK.tokenize(t).map(function(x){ return [x.surface_form,(x.reading&&x.reading!=="*")?x.reading:""]; }); }'+
+        '    catch(_){ return null; }'+
+        '  });'+
+        '  postMessage({type:"tok",id:d.id,out:out});'+
+        '};';
+      const w = new Worker(URL.createObjectURL(new Blob([code],{type:"application/javascript"})));
+      w.onmessage = (e)=>{
+        const d=e.data;
+        if(d.type==="ready"){ if(d.ok){ rubyWorker=w; resolve(w); } else reject(new Error(d.err||"build failed")); }
+        else if(d.type==="tok"){ const p=rubyPending[d.id]; if(p){ delete rubyPending[d.id]; p(d.out); } }
+      };
+      w.onerror = ()=> reject(new Error("worker error"));
+    }catch(e){ reject(e); }
+  });
+  return rubyWorkerReady;
+}
+function workerTokenize(texts){
+  return new Promise((resolve)=>{ const id=++rubyReqSeq; rubyPending[id]=resolve; rubyWorker.postMessage({id, texts}); });
+}
+/* Worker不可時のフォールバック（メインスレッド） */
+let kuromojiTok=null, kuromojiLoading=null;
+function loadKuromoji(){
+  if(kuromojiTok) return Promise.resolve(kuromojiTok);
+  if(kuromojiLoading) return kuromojiLoading;
+  kuromojiLoading = new Promise((resolve,reject)=>{
+    const s=document.createElement("script"); s.src=KUROMOJI_BASE+"build/kuromoji.js";
+    s.onload=()=>{ window.kuromoji.builder({dicPath:KUROMOJI_BASE+"dict/"}).build((err,tok)=>{ if(err){reject(err);return;} kuromojiTok=tok; resolve(tok); }); };
+    s.onerror=()=>reject(new Error("kuromoji script load failed"));
+    document.head.appendChild(s);
+  });
+  return kuromojiLoading;
+}
+
+function collectRubyNodes(root){
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(n){
+      if(!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      let p=n.parentNode;
+      while(p && p!==root){ const t=p.nodeName; if(t==="RUBY"||t==="RT"||t==="RP") return NodeFilter.FILTER_REJECT; p=p.parentNode; }
+      return hasDifficultKanji(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }
+  });
+  const nodes=[]; let n; while(n=walker.nextNode()) nodes.push(n); return nodes;
+}
+function rubyFragmentFromTokens(tokens){
+  const frag=document.createDocumentFragment();
+  for(const pair of tokens){
+    const surface=pair[0], reading = pair[1]?katToHira(pair[1]):"";
+    if(hasDifficultKanji(surface) && reading && reading!==surface){
+      const ruby=document.createElement("ruby");
+      ruby.appendChild(document.createTextNode(surface));
+      const rt=document.createElement("rt"); rt.textContent=reading; ruby.appendChild(rt);
+      frag.appendChild(ruby);
+    } else frag.appendChild(document.createTextNode(surface));
+  }
+  return frag;
+}
+async function applyTotalRuby(root){
+  const nodes = collectRubyNodes(root);
+  const total = nodes.length || 1;
+  setLoadingMsg("ふりがな辞書を準備しています…（初回のみ数十秒）");
+  let useWorker = true, tokMain = null;
+  try{ await getRubyWorker(); }
+  catch(e){ useWorker = false; tokMain = await loadKuromoji(); }   // Worker不可→メインスレッド
+
+  const BATCH = 24;
+  for(let i=0; i<nodes.length; i+=BATCH){
+    const batch = nodes.slice(i, i+BATCH);
+    let results;
+    if(useWorker){ results = await workerTokenize(batch.map(n=>n.nodeValue)); }
+    else { results = batch.map(n=>{ try{ return tokMain.tokenize(n.nodeValue).map(x=>[x.surface_form,(x.reading&&x.reading!=="*")?x.reading:""]); }catch(_){ return null; } }); }
+    for(let j=0;j<batch.length;j++){
+      const tokens = results[j]; if(!tokens) continue;
+      batch[j].parentNode.replaceChild(rubyFragmentFromTokens(tokens), batch[j]);
+    }
+    setLoadingMsg("ふりがなを付けています… " + Math.min(100, Math.round((i+BATCH)/total*100)) + "%");
+    await sleep0();   // バッチ毎にUIへ制御を返す（固まらない）
+  }
+}
+
+let rubyBusy = false;
+async function toggleRuby(){
+  if(!cur.work || rubyBusy) return;
+  const book = document.getElementById("book");
+  const loading = document.getElementById("readerLoading");
+  const btn = document.getElementById("btn-ruby");
+  const frac = cur.pages>1 ? cur.page/(cur.pages-1) : 0;   // 読書位置を保つ
+  if(cur.rubyOn){
+    // OFF: ふりがな適用前に戻す
+    book.innerHTML = cur.baseHTML;
+    cur.rubyOn = false; btn.classList.remove("active");
+    requestAnimationFrame(()=>{ paginate(); goToFraction(frac,false); });
+    return;
+  }
+  // ON: 必要になったので付与
+  rubyBusy = true;
+  loading.classList.remove("hidden");
+  setLoadingMsg("すべての漢字にふりがなを付けています…（初回のみ辞書読み込みで数十秒）");
+  try{
+    await applyTotalRuby(book);
+    cur.rubyOn = true; btn.classList.add("active");
+  }catch(e){
+    setLoadingMsg("ふりがな辞書の読み込みに失敗しました。通信状況をご確認ください。");
+    await sleep0();
+  }
+  loading.classList.add("hidden");
+  rubyBusy = false;
+  requestAnimationFrame(()=>{ paginate(); goToFraction(frac,false); });
+}
+
+/* =========================================================
+   AI CONCIERGE
+   ========================================================= */
+function hasKey(){ return !!(settings.openaiKey && settings.openaiKey.trim()); }
+
+async function openaiChat(messages, opts={}){
+  const res = await fetch("https://api.openai.com/v1/chat/completions",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+settings.openaiKey.trim()},
+    body: JSON.stringify({ model: settings.chatModel||"gpt-4o-mini", messages, temperature:0.7, ...opts })
+  });
+  if(!res.ok){ throw new Error("OpenAI API "+res.status+": "+(await res.text()).slice(0,200)); }
+  const data = await res.json();
+  return data.choices[0].message.content.trim();
+}
+async function openaiImage(prompt){
+  const res = await fetch("https://api.openai.com/v1/images/generations",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+settings.openaiKey.trim()},
+    body: JSON.stringify({ model:"dall-e-3", prompt, n:1, size:"1024x1024" })
+  });
+  if(!res.ok){ throw new Error("OpenAI Image "+res.status+": "+(await res.text()).slice(0,200)); }
+  const data = await res.json();
+  return data.data[0].url;
+}
+
+let aiTab = "dict";
+function openAI(tab){
+  aiTab = tab || aiTab;
+  const scrim = document.createElement("div");
+  scrim.className="scrim"; scrim.onclick=(e)=>{ if(e.target===scrim) scrim.remove(); };
+  scrim.innerHTML = `
+    <div class="drawer" onclick="event.stopPropagation()">
+      <div class="dhead"><h3>📖 読む道具</h3>
+        <button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
+      <div class="ai-tabs">
+        <button data-t="dict">辞書</button>
+        <button data-t="summary">あらすじ</button>
+        <button data-t="era">時代背景</button>
+        <button data-t="illust">挿絵</button>
+      </div>
+      <div class="dbody" id="aiBody"></div>
+    </div>`;
+  document.body.appendChild(scrim);
+  scrim.querySelectorAll(".ai-tabs button").forEach(b=>{
+    b.onclick=()=>{ aiTab=b.dataset.t; renderAITab(); };
+  });
+  renderAITab();
+}
+function renderAITab(){
+  document.querySelectorAll(".ai-tabs button").forEach(b=> b.classList.toggle("on", b.dataset.t===aiTab));
+  const body = document.getElementById("aiBody"); if(!body) return;
+  const wk = cur.work ? cur.work.title+' / '+cur.work.author : '';
+  if(aiTab==="dict"){
+    const sel = currentSelectionText();
+    body.innerHTML =
+      `<div class="field"><label>調べたい言葉</label>
+        <input type="text" id="dictInput" value="${escapeAttr(sel)}" placeholder="言葉を入力、または本文をなぞって選択"
+          onkeydown="if(event.key==='Enter')runDict()"></div>
+       <button class="btn-primary" onclick="runDict()">📖 辞書で調べる</button>
+       ${hasKey()? `<button class="btn-ghost" style="margin-top:8px" onclick="runExplain()">✨ AIで文脈に沿って解説</button>`:``}
+       <div class="note">Wiktionary・Wikipedia から意味を引きます（APIキー不要）。本文の語句をドラッグ選択 →「📖 意味を調べる」でもここに入ります。</div>
+       <div class="ai-out placeholder" id="dictOut" style="margin-top:16px">難読語・古語・固有名詞などの意味を、その場ですぐ調べられます。</div>`;
+    if(sel) runDict();
+  } else if(aiTab==="summary"){
+    const s = (cur.work && SUMMARIES[cur.work.id]) || "（この作品のあらすじは準備中です）";
+    const md = cur.work && META[cur.work.id];
+    const info = md ? `<div class="note" style="margin-top:2px">難易度 ${diffInline(md.diff)} <b style="color:var(--ink)">${DIFF_LABEL[md.diff]}</b> ・ 読了目安 <b style="color:var(--ink)">${fmtTime(md.min)}</b> ・ 分量 ${lenLabel(md.min)}${md.beginner?' ・ <span class="btag">はじめて向き</span>':''}</div>` : "";
+    body.innerHTML =
+      `<div class="note">${wk} ・ あらすじ／解説</div>
+       ${info}
+       <div class="ai-out" id="summaryOut" style="margin-top:12px">${escapeHtml(s)}</div>
+       ${hasKey()? `<button class="btn-ghost" style="margin-top:16px" onclick="runAISummary()">✨ AIで本文から要約し直す</button>`:``}`;
+  } else if(aiTab==="era"){
+    body.innerHTML =
+      `<div class="note">${wk}</div>
+       <div class="ai-out" id="eraOut" style="margin-top:10px"><span class="spin"></span> 時代背景を読み込み中…</div>`;
+    runEra();
+  } else if(aiTab==="illust"){
+    body.innerHTML =
+      `<div class="note">いま読んでいる場面から挿絵を生成します。 ${hasKey()?"":'<span class="demo-tag">DEMO</span>'}</div>
+       <button class="btn-primary" style="margin:10px 0" onclick="runIllust()">この場面の挿絵を生成</button>
+       <div class="illust" id="illustBox" style="margin-top:12px"><span style="color:var(--sub);font-size:13px">まだ生成されていません</span></div>
+       <div class="ai-out placeholder" id="illustCap" style="margin-top:10px"></div>`;
+  }
+}
+function setOut(id, html, cls){ const el=document.getElementById(id); if(!el) return; el.className="ai-out"+(cls?" "+cls:""); el.innerHTML=html; }
+function loadingOut(id,label){ setOut(id, `<span class="spin"></span> ${label||"生成中…"}`); }
+function trimLen(s,n){ s=(s||"").trim(); return s.length>n ? s.slice(0,n)+"…" : s; }
+
+/* ---- 無料の辞書・百科事典（APIキー不要, CORS対応） ---- */
+async function dictLookup(term){
+  // 1) Wiktionary（語義）
+  try{
+    const u = `https://ja.wiktionary.org/w/api.php?action=query&prop=extracts&explaintext=1&redirects=1&titles=${encodeURIComponent(term)}&format=json&origin=*`;
+    const d = await (await fetch(u)).json();
+    const p = Object.values(d.query.pages)[0];
+    if(p && !("missing" in p) && p.extract && p.extract.trim()){
+      return {source:"Wiktionary", title:p.title, text:cleanWiktionary(p.extract)};
+    }
+  }catch(e){}
+  // 2) Wikipedia（百科事典）フォールバック
+  try{
+    const r = await fetch(`https://ja.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(term)}`);
+    if(r.ok){ const s = await r.json(); if(s.extract) return {source:"Wikipedia", title:s.title, text:s.extract, url:s.content_urls&&s.content_urls.desktop&&s.content_urls.desktop.page}; }
+  }catch(e){}
+  return null;
+}
+function cleanWiktionary(t){
+  let s = t.trim();
+  const idx = s.indexOf("\n== ", 3);                         // 次の言語見出しの前で切る
+  if(idx>0) s = s.slice(0, idx);
+  s = s.replace(/===\s*発音[\s\S]*?(?=\n===|\n==|$)/g,"");    // 発音ブロックを除去
+  s = s.replace(/===\s*(翻訳|関連語|類義語|対義語|語源|熟語)[\s\S]*?(?=\n===|\n==|$)/g,"");
+  return s.replace(/\n{3,}/g,"\n\n").trim();
+}
+async function wikiTitleSummary(title){
+  const r = await fetch(`https://ja.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
+  if(!r.ok) return null; const s = await r.json();
+  return {title:s.title, extract:s.extract, url:s.content_urls&&s.content_urls.desktop&&s.content_urls.desktop.page};
+}
+
+async function runDict(){
+  const el = document.getElementById("dictInput");
+  const term = (el?el.value:"").trim();
+  if(!term){ setOut("dictOut","言葉を入力してください。","placeholder"); return; }
+  loadingOut("dictOut","「"+term+"」を辞書で検索中…");
+  try{
+    const r = await dictLookup(term);
+    if(!r){ setOut("dictOut","「"+term+"」の項目が見つかりませんでした。送り仮名を外すなど、表記を変えてお試しください。","placeholder"); return; }
+    const src = r.url? `\n\n▶ 出典: ${r.source}「${r.title}」`:`\n\n（出典: ${r.source}）`;
+    setOut("dictOut", `■ ${r.title}\n\n`+trimLen(r.text,900)+src);
+  }catch(e){ setOut("dictOut","エラー: "+e.message,"placeholder"); }
+}
+async function runExplain(){   // AIによる文脈解説（キー必須）→ dictOut に表示
+  const el = document.getElementById("dictInput");
+  const term = (el?el.value:"").trim();
+  if(!term){ setOut("dictOut","語句を入力してください。","placeholder"); return; }
+  loadingOut("dictOut","「"+term+"」をAIが文脈解説中…");
+  try{
+    const out = await openaiChat([
+      {role:"system",content:"あなたは日本近代文学に精通した読書ガイドです。読者が読書中に出会った語句を、この文脈での意味に絞って簡潔にやさしく解説します。150字以内。"},
+      {role:"user",content:`作品『${cur.work?.title}』（${cur.work?.author}）を読んでいます。語句「${term}」をこの文脈に沿って解説してください。\n\n文脈抜粋：${cur.plainText.slice(0,600)}`}
+    ]);
+    setOut("dictOut", "✨ AI解説\n\n"+escapeHtml(out));
+  }catch(e){ setOut("dictOut","エラー: "+e.message,"placeholder"); }
+}
+async function runAISummary(){
+  if(!hasKey()) return;
+  loadingOut("summaryOut","AIが要約しています…");
+  try{
+    const out = await openaiChat([
+      {role:"system",content:"あなたは読書ガイドです。結末のネタバレは避け、作品の導入と読みどころを300字以内で魅力的に紹介します。"},
+      {role:"user",content:`『${cur.work?.title}』（${cur.work?.author}）のあらすじと読みどころ。本文冒頭：${cur.plainText.slice(0,900)}`}
+    ]);
+    setOut("summaryOut", escapeHtml(out));
+  }catch(e){ setOut("summaryOut","エラー: "+e.message,"placeholder"); }
+}
+async function runEra(){
+  try{
+    if(hasKey()){
+      const out = await openaiChat([
+        {role:"system",content:"あなたは文学史の解説者です。作品の時代背景・文化的文脈を250字以内で解説します。"},
+        {role:"user",content:`『${cur.work?.title}』（${cur.work?.author}）が書かれた時代背景と、読む上で知っておくと面白い文化・歴史的文脈を教えてください。`}
+      ]);
+      setOut("eraOut", escapeHtml(out));
+    } else {
+      const r = await wikiTitleSummary(cur.work.author);
+      if(r && r.extract) setOut("eraOut", `■ ${cur.work.author}\n\n`+trimLen(r.extract,850)+(r.url?`\n\n▶ 出典: Wikipedia`:""));
+      else setOut("eraOut", mockEra(), "placeholder");
+    }
+  }catch(e){ setOut("eraOut","エラー: "+e.message,"placeholder"); }
+}
+async function runIllust(){
+  const box = document.getElementById("illustBox");
+  const cap = document.getElementById("illustCap");
+  const scene = visiblePageText().slice(0,300) || cur.plainText.slice(0,300);
+  box.innerHTML = `<span class="spin"></span>`;
+  cap.className="ai-out"; cap.textContent = "場面を解釈しています…";
+  try{
+    if(hasKey()){
+      const artPrompt = await openaiChat([
+        {role:"system",content:"あなたは挿絵ディレクターです。与えられた日本文学の一場面を、絵画的な英語の画像生成プロンプト1文に変換します。文体は 'Japanese literary illustration, ...' で始め、人物の顔の細部は避け情景重視。"},
+        {role:"user",content:scene}
+      ]);
+      cap.textContent = "挿絵を描いています…";
+      const url = await openaiImage("Japanese literary book illustration, muted ink-wash palette. "+artPrompt);
+      box.innerHTML = `<img src="${url}" alt="挿絵">`;
+      cap.textContent = artPrompt;
+    } else {
+      const {key} = analyzeEmotion(scene);
+      box.innerHTML = mockIllustSVG(key, scene);
+      cap.innerHTML = `<span class="demo-tag">DEMO</span> 情感「${EMOTIONS[key].label}」に基づく生成イメージ（APIキー設定で実際の挿絵生成に切り替わります）`;
+    }
+  }catch(e){ box.innerHTML = `<span style="color:var(--sub);font-size:12px;padding:14px">${e.message}</span>`; cap.textContent=""; }
+}
+function lookupSelection(){
+  const t = currentSelectionText();
+  document.getElementById("seltip").classList.add("hidden");
+  openAI("dict");
+  setTimeout(()=>{ const i=document.getElementById("dictInput"); if(i){ i.value=t; runDict(); } }, 60);
+}
+
+function mockExplain(term){
+  return `【デモ表示】「${term}」\n\nこの語句は、作品の文脈においてしばしば情景や心情を象徴的に示す言葉として用いられます。前後の描写と重ねて読むと、作者が込めた含みがより鮮明になります。\n\n※ 設定画面で OpenAI の API キーを入力すると、AIが文脈に沿った実際の解説を返します。`;
+}
+function mockSummary(){
+  return `【デモ表示】『${cur.work?.title}』（${cur.work?.author}）\n\n静かな筆致の内に、人間の心の機微が丹念に描き出されていく一編です。何気ない情景描写の積み重ねが、やがて登場人物の内面へと読者を導いていきます。\n\n※ API キーを設定すると、本文に基づく実際の要約に切り替わります。`;
+}
+function mockEra(){
+  return `【デモ表示】時代背景\n\n近代日本の文学は、急速な西洋化と伝統との相克のなかで、新しい「個人」の内面を描く言葉を模索しました。本作もそうした時代の空気を色濃く映しています。\n\n※ API キーを設定すると、作品ごとの具体的な背景解説が表示されます。`;
+}
+function mockIllustSVG(key, scene){
+  const e = EMOTIONS[key]; const c = e.color;
+  const seed = [...scene].reduce((a,ch)=>a+ch.charCodeAt(0),0);
+  const hills = [0,1,2].map(i=>{
+    const y = 620 - i*70 - (seed% (40+i*10));
+    return `<path d="M0 ${y} Q 256 ${y-60-(seed%50)} 512 ${y} L512 720 L0 720 Z" fill="${c}" opacity="${0.18+i*0.12}"/>`;
+  }).join("");
+  const moonY = 150 + (seed%120);
+  return `<svg viewBox="0 0 512 720" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${c}" stop-opacity="0.28"/><stop offset="1" stop-color="${c}" stop-opacity="0.05"/>
+    </linearGradient></defs>
+    <rect width="512" height="720" fill="url(#sky)"/>
+    <circle cx="${140+(seed%240)}" cy="${moonY}" r="46" fill="${c}" opacity="0.5"/>
+    ${hills}
+    <g opacity="0.5" fill="${c}">${Array.from({length:14}).map((_,i)=>`<circle cx="${(seed*7+i*90)%512}" cy="${(seed*3+i*55)%400}" r="${1+(i%3)}"/>`).join("")}</g>
+  </svg>`;
+}
+
+/* =========================================================
+   SETTINGS
+   ========================================================= */
+function openSettings(){
+  const scrim = document.createElement("div");
+  scrim.className="scrim center"; scrim.onclick=(e)=>{ if(e.target===scrim) scrim.remove(); };
+  scrim.innerHTML = `
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="dhead"><h3>⚙️ 設定</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
+      <div class="dbody">
+        <div class="field"><label>テーマ</label>
+          <div class="seg" id="segTheme">
+            <button data-v="washi">和紙</button><button data-v="light">白</button><button data-v="dark">夜</button>
+          </div></div>
+        <div class="field"><label>文字サイズ（<span id="sizeVal">${settings.size}</span>px）</label>
+          <input type="range" min="8" max="30" step="1" value="${settings.size}" style="width:100%" id="sizeRange">
+          <div class="note">スマホでは 10〜14px あたりが目安です。</div>
+        </div>
+        <div class="note" style="margin:-6px 0 18px">💡 ふりがな（総ルビ）は、読書画面の「ふりがな」ボタンで必要なときだけ付けられます。</div>
+        <hr style="border:none;border-top:1px solid var(--line);margin:22px 0">
+        <div class="field"><label>OpenAI API キー（任意）</label>
+          <input type="password" id="keyInput" value="${escapeAttr(settings.openaiKey)}" placeholder="sk-... 未入力ならデモ動作">
+          <div class="note">キーはこの端末のブラウザ内（localStorage）にのみ保存され、外部には送信されません（OpenAIへのAPI通信を除く）。挿絵生成・語句解説などが実際に動作します。</div>
+        </div>
+        <div class="field"><label>チャットモデル</label>
+          <select id="modelSelect">
+            <option value="gpt-4o-mini">gpt-4o-mini（軽量・低コスト）</option>
+            <option value="gpt-4o">gpt-4o（高品質）</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="commitSettings(this)">保存する</button>
+      </div>
+    </div>`;
+  document.body.appendChild(scrim);
+  segInit("segTheme", settings.theme);
+  document.getElementById("modelSelect").value = settings.chatModel;
+  const sr=document.getElementById("sizeRange");
+  sr.oninput=()=>{ document.getElementById("sizeVal").textContent=sr.value;
+    document.documentElement.style.setProperty("--reader-size", sr.value+"px");
+    if(!document.getElementById("reader").classList.contains("hidden")){
+      const frac = cur.pages>1?cur.page/(cur.pages-1):0; paginate(); goToFraction(frac,false);
+    }
+  };
+}
+function segInit(id, val){
+  const box=document.getElementById(id); if(!box) return;
+  box.querySelectorAll("button").forEach(b=>{
+    b.classList.toggle("on", b.dataset.v===val);
+    b.onclick=()=>{ box.querySelectorAll("button").forEach(x=>x.classList.remove("on")); b.classList.add("on");
+      if(id==="segTheme"){ settings.theme=b.dataset.v; applyTheme(); } };
+  });
+}
+function commitSettings(btn){
+  settings.theme = document.querySelector("#segTheme .on").dataset.v;
+  settings.size = parseInt(document.getElementById("sizeRange").value,10);
+  settings.openaiKey = document.getElementById("keyInput").value;
+  settings.chatModel = document.getElementById("modelSelect").value;
+  saveSettings();
+  if(!document.getElementById("reader").classList.contains("hidden")){
+    const frac = cur.pages>1?cur.page/(cur.pages-1):0; paginate(); goToFraction(frac,false);
+  }
+  btn.textContent="保存しました ✓";
+  setTimeout(()=> btn.closest(".scrim").remove(), 600);
+}
+
+/* ---------- utils ---------- */
+function escapeHtml(s){ return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+function escapeAttr(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+/* ---------- boot ---------- */
+applyTheme();
+renderLibrary();
+</script>
+</body>
+</html>
