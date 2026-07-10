@@ -1148,7 +1148,7 @@ document.getElementById("stage").addEventListener("wheel", e=>{
   wheelAccum += (e.deltaY||e.deltaX);
   const step = 40;                                  // これだけ溜まるごとに1ページ
   const n = Math.trunc(wheelAccum/step);
-  if(n!==0){ wheelAccum -= n*step; turn(n>0?1:-1, Math.abs(n)); }
+  if(n!==0){ wheelAccum -= n*step; turn(n>0?-1:1, Math.abs(n)); }   // 前(上)スクロール=進む / 後(下)=戻る
   clearTimeout(wheelTimer); wheelTimer=setTimeout(()=>wheelAccum=0,180);
 },{passive:false});
 // スワイプでのページ送りは廃止（送りはボタンのみ）。ピンチズーム中の誤爆だけ検知して抑止する。
