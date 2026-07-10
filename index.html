@@ -159,7 +159,7 @@
     box-shadow:0 3px 12px -6px rgba(0,0,0,.5); color:var(--sub); opacity:.5;
     transition:opacity .15s, border-color .15s, color .15s; -webkit-tap-highlight-color:transparent}
   .stage .page-turn:hover,.stage .page-turn:active{opacity:1; border-color:var(--accent); color:var(--accent)}
-  .stage .pt-next{left:10px} .stage .pt-prev{right:10px}
+  .stage .pt-left{left:10px} .stage .pt-right{right:10px}
   .stage .edge-hint{font-size:26px; line-height:1}
 
   .readbar{position:absolute; left:0; right:0; bottom:0; min-height:56px; z-index:20;
@@ -355,6 +355,7 @@
       <span class="lbl">並べ替え</span>
       <select id="sortSel" onchange="setSort(this.value)">
         <option value="author">著者順</option>
+        <option value="kana">五十音順（作品名）</option>
         <option value="reco">おすすめ順</option>
         <option value="easy">やさしい順</option>
         <option value="short">短い順（読了目安）</option>
@@ -379,8 +380,8 @@
 <!-- ========== READER ========== -->
 <div id="reader" class="view hidden">
   <div class="stage" id="stage">
-    <div class="page-turn pt-prev" onclick="turn(-1)"><span class="edge-hint">›</span></div>
-    <div class="page-turn pt-next" onclick="turn(1)"><span class="edge-hint">‹</span></div>
+    <div class="page-turn pt-left" onclick="turn(-1)"><span class="edge-hint">‹</span></div>
+    <div class="page-turn pt-right" onclick="turn(1)"><span class="edge-hint">›</span></div>
     <div class="book" id="book"></div>
     <div class="loading-full hidden" id="readerLoading"><span class="spin"></span><span id="readerLoadingMsg">本を開いています…</span></div>
   </div>
@@ -845,6 +846,7 @@ function renderLibrary(){
   else if(libSort==="short") list = [...list].sort((a,b)=> m(a.id).min-m(b.id).min);
   else if(libSort==="reco")  list = [...list].sort((a,b)=>
       (m(b.id).beginner-m(a.id).beginner) || (m(a.id).diff-m(b.id).diff) || (m(a.id).min-m(b.id).min));
+  else if(libSort==="kana")  list = [...list].sort((a,b)=> a.title.localeCompare(b.title,"ja") || a.author.localeCompare(b.author,"ja"));
   else if(libSort==="rating")list = [...list].sort((a,b)=> ((shelf[b.id]&&shelf[b.id].rating)||0)-((shelf[a.id]&&shelf[a.id].rating)||0));
   else if(libSort==="recent")list = [...list].sort((a,b)=> lastActivity(b.id).localeCompare(lastActivity(a.id)));
 
@@ -1210,49 +1212,85 @@ function wrapSelPreview(flat, fStart, fEnd){
     }catch(e){}
   }
 }
-function selectSentenceAt(x,y){
-  const hit=caretFlatAt(x,y); if(!hit) return false;
-  const t=hit.flat.text, DELIM=/[。．！？!?…\n]/;
-  let s=hit.idx, e=hit.idx;
-  while(s>0 && !DELIM.test(t[s-1])) s--;
-  while(e<t.length && !DELIM.test(t[e])) e++;
-  if(e<t.length) e++;                        // 区切り文字も含める
-  while(s<e && /\s/.test(t[s])) s++;         // 前後の空白/改行を除去
-  while(e>s && /\s/.test(t[e-1])) e--;
-  const text=t.slice(s,e).trim();
-  if(!text) return false;
-  clearCustomSel();
-  const flat=buildFlat(document.getElementById("book"));   // clearでDOMが変わるため作り直す
+function scriptClass(ch){
+  if(/[一-鿿々〆ヶ]/.test(ch)) return "kanji";
+  if(/[ぁ-ゖ]/.test(ch)) return "hira";
+  if(/[ァ-ヺー]/.test(ch)) return "kata";
+  if(/[0-9A-Za-zＡ-Ｚａ-ｚ０-９]/.test(ch)) return "latin";
+  return "other";
+}
+// キャレット位置の「語」＝同じ字種の連なり（長すぎる連なりは控えめに切る）
+function wordRangeAt(text, idx){
+  if(idx>=text.length) idx=Math.max(0,text.length-1);
+  if(idx<0) return [0,0];
+  const cls=scriptClass(text[idx]);
+  if(cls==="other") return [idx, Math.min(idx+1,text.length)];
+  let s=idx, e=idx+1;
+  while(s>0 && scriptClass(text[s-1])===cls) s--;
+  while(e<text.length && scriptClass(text[e])===cls) e++;
+  if(e-s>16){ s=Math.max(s, idx-6); e=Math.min(e, idx+10); }
+  return [s,e];
+}
+// カスタム選択を [s,e) に設定＆見た目更新（DOMはclear済み・flatはclean前提）
+function setCustomSelRange(flat, s, e){
+  s=Math.max(0,s); e=Math.min(flat.text.length, Math.max(s+1,e));
+  const text=flat.text.slice(s,e);
   let occ=0, from=0, idx; while((idx=flat.text.indexOf(text,from))>=0 && idx<s){ occ++; from=idx+1; }
   customSel={text, fStart:s, fEnd:e, occurrence:occ};
   wrapSelPreview(flat, s, e);
-  const m=document.querySelector("#book mark.selpreview");
-  const tip=document.getElementById("seltip");
-  if(m){ const r=m.getBoundingClientRect(); tip.style.left=(r.left+r.width/2)+"px"; tip.style.top=r.top+"px"; }
-  else { tip.style.left=x+"px"; tip.style.top=y+"px"; }
-  tip.classList.remove("hidden");
-  return true;
 }
-(function(){   // 長押し検出（タッチのみ）
+function showSelMenu(){
+  const marks=document.querySelectorAll("#book mark.selpreview");
+  const tip=document.getElementById("seltip");
+  if(marks.length){
+    let L=Infinity,R=-Infinity,T=Infinity;
+    marks.forEach(m=>{ const r=m.getBoundingClientRect(); L=Math.min(L,r.left); R=Math.max(R,r.right); T=Math.min(T,r.top); });
+    tip.style.left=((L+R)/2)+"px"; tip.style.top=T+"px";
+  }
+  tip.classList.remove("hidden");
+}
+(function(){   // タッチ: 長押しで語を選択→そのままドラッグで範囲調整（iOS標準選択は使わない）
   const stage=document.getElementById("stage"); if(!stage) return;
-  let timer=null, sx=0, sy=0, longFired=false;
+  let timer=null, sx=0, sy=0, selecting=false, anchor=-1, rafPending=false, lastXY=null;
   const cancel=()=>{ if(timer){ clearTimeout(timer); timer=null; } };
   const isUI=t=> t && t.closest && t.closest(".page-turn, .readbar, #seltip, #hltip, mark.hl");
+  const beginSelect=(x,y)=>{
+    clearCustomSel();
+    const hit=caretFlatAt(x,y); if(!hit) return false;
+    const wr=wordRangeAt(hit.flat.text, hit.idx);
+    anchor=wr[0];                                   // ドラッグは語の先頭を起点に伸縮
+    setCustomSelRange(hit.flat, wr[0], wr[1]);
+    selecting=true;
+    if(navigator.vibrate){ try{navigator.vibrate(8);}catch(_){} }
+    return true;
+  };
+  const extendSelect=(x,y)=>{
+    clearCustomSel();
+    const hit=caretFlatAt(x,y); if(!hit || anchor<0) return;
+    setCustomSelRange(hit.flat, Math.min(anchor,hit.idx), Math.max(anchor,hit.idx)+1);
+  };
   stage.addEventListener("touchstart",e=>{
-    longFired=false; cancel();
+    cancel(); selecting=false;
     if(e.touches.length!==1 || isUI(e.target)) return;
     const t=e.touches[0]; sx=t.clientX; sy=t.clientY;
-    timer=setTimeout(()=>{ timer=null; longFired=true; if(selectSentenceAt(sx,sy) && navigator.vibrate){ try{navigator.vibrate(8);}catch(_){} } }, 460);
+    timer=setTimeout(()=>{ timer=null; beginSelect(sx,sy); }, 420);
   },{passive:true});
   stage.addEventListener("touchmove",e=>{
+    if(selecting){
+      if(e.cancelable) e.preventDefault();                 // 選択中はスクロール/ズームを止める
+      const t=e.touches[0]; if(!t) return;
+      lastXY=[t.clientX,t.clientY];
+      if(!rafPending){ rafPending=true; requestAnimationFrame(()=>{ rafPending=false; if(lastXY) extendSelect(lastXY[0],lastXY[1]); }); }
+      return;
+    }
     const t=e.touches[0]; if(!t) return;
-    if(Math.abs(t.clientX-sx)>10 || Math.abs(t.clientY-sy)>10) cancel();
-  },{passive:true});
+    if(Math.abs(t.clientX-sx)>10 || Math.abs(t.clientY-sy)>10) cancel();   // 長押し確定前に動いたら中止
+  },{passive:false});
   stage.addEventListener("touchend",e=>{
     cancel();
-    if(longFired){ longFired=false; return; }        // 長押しで選択済み
-    if(isUI(e.target)) return;                        // ボタン等は無視
-    if(customSel){ clearCustomSel(); hideSelTip(); }  // 何もない所をタップ→選択解除
+    if(selecting){ selecting=false; if(customSel) showSelMenu(); return; }
+    if(isUI(e.target)) return;
+    if(customSel){ clearCustomSel(); hideSelTip(); }        // 何もない所をタップ→選択解除
   },{passive:true});
 })();
 
@@ -2071,7 +2109,7 @@ function openHelp(){
 
         '<h4>📚 調べる・💬 AIに聞く</h4>'+
         '<ul>'+
-          '<li>本文を<b>なぞって選択</b>すると、メニューが出ます：<b>🖍ハイライト／📝メモ／💬AIに聞く／📖辞書</b>。</li>'+
+          '<li>本文を<b>長押し</b>すると語が選択され、そのまま<b>指を動かすと範囲を調整</b>できます（PCはドラッグ選択）。指を離すとメニュー：<b>🖍ハイライト／📝メモ／💬AIに聞く／📖辞書</b>。</li>'+
           '<li>辞書は無料（Wiktionary・Wikipedia）。AIは作品全体にも質問でき、上部の<kbd>💬 AIに質問</kbd>から（テーマ／あらすじ／テスト対策 など）。</li>'+
         '</ul>'+
 
