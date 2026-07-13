@@ -318,9 +318,37 @@
     .readbar{gap:10px; padding:0 12px}
     .readbar .rtitle{max-width:34vw}
   }
+  /* ---- カスタムアイコン（SVGスプライト・currentColorでテーマに追従） ---- */
+  .ic{width:1.12em;height:1.12em;display:inline-block;vertical-align:-.18em;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+  .icon-btn .ic{width:1.28em;height:1.28em;vertical-align:-.24em}
+  .ic .fillc{fill:currentColor;stroke:none}
 </style>
 </head>
 <body data-theme="washi">
+<!-- カスタムアイコン定義（線画スプライト） -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <symbol id="ic-book" viewBox="0 0 24 24"><path d="M12 6.2C10.3 5 8.2 4.5 5.8 4.5c-1 0-1.7.1-2.3.3v13.4c.6-.2 1.3-.3 2.3-.3 2.4 0 4.5.5 6.2 1.7M12 6.2c1.7-1.2 3.8-1.7 6.2-1.7 1 0 1.7.1 2.3.3v13.4c-.6-.2-1.3-.3-2.3-.3-2.4 0-4.5.5-6.2 1.7M12 6.2v13.4"/></symbol>
+  <symbol id="ic-chat" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3.7 6.7L4 20l1.3-3.7A7.9 7.9 0 0 1 4 12Z"/><path d="M8.5 11.5h7M8.5 14h4.5"/></symbol>
+  <symbol id="ic-highlight" viewBox="0 0 24 24"><path d="M4 20l.6-3.4L14.6 6.6a2 2 0 0 1 2.8 0l1 1a2 2 0 0 1 0 2.8L8.4 20.4 4 20Z"/><path d="M13 8.2l2.8 2.8M4.6 16.6 8.4 20.4"/></symbol>
+  <symbol id="ic-pen" viewBox="0 0 24 24"><path d="M4 20l1-4L16.2 4.8a1.7 1.7 0 0 1 2.4 0l.6.6a1.7 1.7 0 0 1 0 2.4L8 19l-4 1Z"/><path d="M14.5 6.5l3 3"/></symbol>
+  <symbol id="ic-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.1"/><path d="M12 3v2.4M12 18.6V21M21 12h-2.4M5.4 12H3M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7M18.4 18.4l-1.7-1.7M7.3 7.3 5.6 5.6"/></symbol>
+  <symbol id="ic-bookmark" viewBox="0 0 24 24"><path d="M7 4h10a1 1 0 0 1 1 1v15l-6-4-6 4V5a1 1 0 0 1 1-1Z"/></symbol>
+  <symbol id="ic-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.7 5.1a3 3 0 0 0 2.2 2.2L21 12l-5.1 1.7a3 3 0 0 0-2.2 2.2L12 21l-1.7-5.1a3 3 0 0 0-2.2-2.2L3 12l5.1-1.7a3 3 0 0 0 2.2-2.2L12 3Z"/></symbol>
+  <symbol id="ic-chart" viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/></symbol>
+  <symbol id="ic-collection" viewBox="0 0 24 24"><path d="M7 3.5h7L18.5 8v11a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5Z"/><path d="M14 3.5V8h4.5M9 12.5h5M9 15.5h3.5"/></symbol>
+  <symbol id="ic-bulb" viewBox="0 0 24 24"><path d="M9.5 18h5M10.3 21h3.4M12 3a6 6 0 0 0-3.8 10.6c.8.7 1.3 1.4 1.3 2.4h5c0-1 .5-1.7 1.3-2.4A6 6 0 0 0 12 3Z"/></symbol>
+  <symbol id="ic-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.2-2.7 4"/><circle cx="12" cy="17.2" r=".95" class="fillc"/></symbol>
+  <symbol id="ic-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.3V12l3.2 2"/></symbol>
+  <symbol id="ic-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M15.6 8.4l-2 5.2-5.2 2 2-5.2 5.2-2Z"/></symbol>
+  <symbol id="ic-books" viewBox="0 0 24 24"><rect x="4" y="4.5" width="3.6" height="15" rx=".6"/><rect x="9" y="4.5" width="3.6" height="15" rx=".6"/><path d="M15 6l3.3.9-3 11.7-3.3-.9"/></symbol>
+  <symbol id="ic-key" viewBox="0 0 24 24"><circle cx="8" cy="12" r="3.6"/><path d="M11.6 12H20M17 12v3M20 12v2.4"/></symbol>
+  <symbol id="ic-save" viewBox="0 0 24 24"><path d="M5.5 4.5H16L19.5 8v10.5a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1V5.5a1 1 0 0 1 1-1Z"/><path d="M8 4.5v4h6v-4M8 19.5v-5h8v5"/></symbol>
+  <symbol id="ic-download" viewBox="0 0 24 24"><path d="M12 4v10M8 10.5l4 4 4-4M5 19.5h14"/></symbol>
+  <symbol id="ic-upload" viewBox="0 0 24 24"><path d="M12 15.5V5.5M8 9.5l4-4 4 4M5 19.5h14"/></symbol>
+  <symbol id="ic-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M6.5 7l1 12a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1l1-12M10 11v6M14 11v6"/></symbol>
+  <symbol id="ic-flame" viewBox="0 0 24 24"><path d="M12 3c.9 2.8-1.3 3.9-1.3 6.2 0 1 .6 1.7 1.3 1.7s1.3-.7 1.3-1.7c1 .8 2.2 2.4 2.2 4.4a5.5 5.5 0 0 1-11 0c0-2.7 1.9-4.4 3-5.9C8.7 6.3 9 4.5 9 3c1 .6 2.4 1.8 3 3.5.5-1.3.4-2.6 0-3.5Z"/></symbol>
+  <symbol id="ic-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+</defs></svg>
 
 <!-- ========== TOP BAR ========== -->
 <div class="topbar">
@@ -329,16 +357,16 @@
     <span class="sub">SHIORI &nbsp;/&nbsp; 青空文庫コンシェルジュ</span>
   </div>
   <div class="spacer"></div>
-  <button class="icon-btn" id="btn-ask" onclick="openAsk()" title="AIに質問" hidden>💬<span class="btl"> AIに質問</span></button>
-  <button class="icon-btn" id="btn-notes" onclick="openNotes()" title="ハイライト・メモ" hidden>🖍<span class="btl"> ノート</span></button>
-  <button class="icon-btn" id="btn-summary" onclick="openAI('summary')" title="あらすじ・解説" hidden>📖<span class="btl"> あらすじ</span></button>
-  <button class="icon-btn" id="btn-check" onclick="toggleCheckReader()" title="気になる（あとで読む）に登録" hidden>🔖<span class="btl"> 気になる</span></button>
-  <button class="icon-btn" id="btn-review" onclick="openReview(cur.work&&cur.work.id)" title="レビュー" hidden>📝<span class="btl"> レビュー</span></button>
+  <button class="icon-btn" id="btn-ask" onclick="openAsk()" title="AIに質問" hidden><svg class=ic><use href=#ic-chat /></svg><span class="btl"> AIに質問</span></button>
+  <button class="icon-btn" id="btn-notes" onclick="openNotes()" title="ハイライト・メモ" hidden><svg class=ic><use href=#ic-highlight /></svg><span class="btl"> ノート</span></button>
+  <button class="icon-btn" id="btn-summary" onclick="openAI('summary')" title="あらすじ・解説" hidden><svg class=ic><use href=#ic-book /></svg><span class="btl"> あらすじ</span></button>
+  <button class="icon-btn" id="btn-check" onclick="toggleCheckReader()" title="気になる（あとで読む）に登録" hidden><svg class=ic><use href=#ic-bookmark /></svg><span class="btl"> 気になる</span></button>
+  <button class="icon-btn" id="btn-review" onclick="openReview(cur.work&&cur.work.id)" title="レビュー" hidden><svg class=ic><use href=#ic-pen /></svg><span class="btl"> レビュー</span></button>
   <button class="icon-btn" id="btn-ruby" onclick="toggleRuby()" title="ふりがな（総ルビ）" hidden>ふ<span class="btl"> ふりがな</span></button>
-  <button class="icon-btn" id="btn-stats" onclick="openStats()" title="読書統計">📊<span class="btl"> 統計</span></button>
-  <button class="icon-btn" id="btn-collection" onclick="openCollection()" title="名文コレクション">📑<span class="btl"> 名文集</span></button>
-  <button class="icon-btn" onclick="openHelp()" title="使い方・ヘルプ">❓<span class="btl"> 使い方</span></button>
-  <button class="icon-btn" onclick="openSettings()" title="設定">⚙️<span class="btl"> 設定</span></button>
+  <button class="icon-btn" id="btn-stats" onclick="openStats()" title="読書統計"><svg class=ic><use href=#ic-chart /></svg><span class="btl"> 統計</span></button>
+  <button class="icon-btn" id="btn-collection" onclick="openCollection()" title="名文コレクション"><svg class=ic><use href=#ic-collection /></svg><span class="btl"> 名文集</span></button>
+  <button class="icon-btn" onclick="openHelp()" title="使い方・ヘルプ"><svg class=ic><use href=#ic-help /></svg><span class="btl"> 使い方</span></button>
+  <button class="icon-btn" onclick="openSettings()" title="設定"><svg class=ic><use href=#ic-settings /></svg><span class="btl"> 設定</span></button>
 </div>
 
 <!-- ========== LIBRARY ========== -->
@@ -374,7 +402,7 @@
         <option value="童話">童話・世界の名作</option>
       </select>
       <button class="chipbtn" id="begBtn" onclick="toggleBeginner()">◎ はじめての一冊</button>
-      <button class="chipbtn" id="checkBtn" onclick="toggleChecked()">🔖 気になる</button>
+      <button class="chipbtn" id="checkBtn" onclick="toggleChecked()"><svg class=ic><use href=#ic-bookmark /></svg> 気になる</button>
     </div>
     <div id="recos" class="recos hidden"></div>
     <div class="lib-count" id="libCount"></div>
@@ -397,8 +425,8 @@
   </div>
   <div class="finish-toast hidden" id="finishToast">
     <div class="ft-top">
-      <span>『<span id="ftBookTitle"></span>』を読み終えました 🎉</span>
-      <button class="ft-close" onclick="dismissFinish()" aria-label="閉じる">✕</button>
+      <span>『<span id="ftBookTitle"></span>』を読み終えました <svg class=ic><use href=#ic-sparkle /></svg></span>
+      <button class="ft-close" onclick="dismissFinish()" aria-label="閉じる"><svg class=ic><use href=#ic-close /></svg></button>
     </div>
     <div class="ft-recos" id="ftRecos"></div>
     <div class="ft-actions">
@@ -409,15 +437,15 @@
 </div>
 
 <div id="seltip" class="hidden" onmousedown="event.preventDefault()">
-  <button onclick="selHighlight()" title="ハイライト">🖍<span>ハイライト</span></button>
-  <button onclick="selMemo()" title="メモ">📝<span>メモ</span></button>
-  <button onclick="selAsk()" title="AIに聞く">💬<span>AIに聞く</span></button>
-  <button onclick="lookupSelection()" title="辞書で調べる">📖<span>辞書</span></button>
+  <button onclick="selHighlight()" title="ハイライト"><svg class=ic><use href=#ic-highlight /></svg><span>ハイライト</span></button>
+  <button onclick="selMemo()" title="メモ"><svg class=ic><use href=#ic-pen /></svg><span>メモ</span></button>
+  <button onclick="selAsk()" title="AIに聞く"><svg class=ic><use href=#ic-chat /></svg><span>AIに聞く</span></button>
+  <button onclick="lookupSelection()" title="辞書で調べる"><svg class=ic><use href=#ic-book /></svg><span>辞書</span></button>
 </div>
 <div id="hltip" class="hidden" onmousedown="event.preventDefault()">
-  <button onclick="hlMemo()" title="メモ">📝<span>メモ</span></button>
-  <button onclick="hlCycleColor()" title="色を変える">🎨<span>色</span></button>
-  <button class="del" onclick="hlDelete()" title="ハイライトを削除">🗑<span>削除</span></button>
+  <button onclick="hlMemo()" title="メモ"><svg class=ic><use href=#ic-pen /></svg><span>メモ</span></button>
+  <button onclick="hlCycleColor()" title="色を変える"><svg class=ic><use href=#ic-sparkle /></svg><span>色</span></button>
+  <button class="del" onclick="hlDelete()" title="ハイライトを削除"><svg class=ic><use href=#ic-trash /></svg><span>削除</span></button>
 </div>
 
 <script>
@@ -814,6 +842,16 @@ function readStats(){
   while(set.has(key(d))){ streak++; d.setDate(d.getDate()-1); }
   return { totalMin: Math.round(totalSec/60), days: set.size, streak };
 }
+function monthlyStats(n){
+  const map=readLog.days||{}, months={};
+  for(const d in map){ const mo=d.slice(0,7); months[mo]=(months[mo]||0)+(map[d]||0); }
+  const out=[], now=new Date();
+  for(let i=n-1;i>=0;i--){ const dt=new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const k=dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0");
+    out.push({ label:(dt.getMonth()+1)+"月", min:Math.round((months[k]||0)/60) });
+  }
+  return out;
+}
 setInterval(readTick, 20000);   // 読書画面が見えている間だけ加算
 document.addEventListener("visibilitychange", ()=>{ readTick(); _readLast=Date.now(); });
 window.addEventListener("pagehide", ()=>{ readTick(); });
@@ -878,7 +916,7 @@ function recoCard(w, md, reason, cont){
     <div class="rc-title">${w.title}</div>
     <div class="rc-author">${w.author}</div>
     <div class="rc-reason">${cont?"▶ ":""}${escapeHtml(reason)}</div>
-    <div class="rc-meta">難 ${diffInline(md.diff)} ・ ⏱ ${fmtTime(md.min)}</div>
+    <div class="rc-meta">難 ${diffInline(md.diff)} ・ <svg class=ic><use href=#ic-clock /></svg> ${fmtTime(md.min)}</div>
   </div>`;
 }
 function renderRecommendations(show){
@@ -906,7 +944,7 @@ function renderRecommendations(show){
     return {w, md, sc, reason};
   }).sort((a,b)=> b.sc-a.sc);
 
-  let html=`<h2>🧭 ${hasHistory?"あなたへの次の一冊":"はじめの一冊に"}</h2><div class="reco-row">`;
+  let html=`<h2><svg class=ic><use href=#ic-compass /></svg> ${hasHistory?"あなたへの次の一冊":"はじめの一冊に"}</h2><div class="reco-row">`;
   readingWorks.slice(0,2).forEach(w=>{
     const pct=Math.round((shelf[w.id].fraction||0)*100);
     html+=recoCard(w, m(w.id), `続きから（${pct}%）`, true);
@@ -967,12 +1005,12 @@ function renderLibrary(){
     c.className = "card";
     c.innerHTML =
       `<span class="spine"></span>` +
-      `<button class="checkbtn ${r.checked?'on':''}" title="気になる（あとで読む）に登録" onclick="toggleCheck(event,'${w.id}')">🔖<span>${r.checked?'気になる済':'気になる'}</span></button>` +
+      `<button class="checkbtn ${r.checked?'on':''}" title="気になる（あとで読む）に登録" onclick="toggleCheck(event,'${w.id}')"><svg class=ic><use href=#ic-bookmark /></svg><span>${r.checked?'気になる済':'気になる'}</span></button>` +
       `<div class="vtitle">${w.title}</div>` +
       `<div class="author">${w.author}</div>` +
       `<div class="meta">` +
         `<span class="diffm" title="難易度：${DIFF_LABEL[md.diff]||"—"}">難 ${diffMark(md.diff)}</span>` +
-        `<span class="rt">⏱ ${fmtTime(md.min)}</span>` +
+        `<span class="rt"><svg class=ic><use href=#ic-clock /></svg> ${fmtTime(md.min)}</span>` +
         (md.beginner ? `<span class="btag">はじめて</span>` : ``) +
       `</div>` +
       `<div class="statusline">` +
@@ -995,7 +1033,7 @@ function openReview(id){
   scrim.className = "scrim center"; scrim.onclick=(e)=>{ if(e.target===scrim) scrim.remove(); };
   scrim.innerHTML = `
     <div class="modal" onclick="event.stopPropagation()">
-      <div class="dhead"><h3>📝 レビュー</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
+      <div class="dhead"><h3><svg class=ic><use href=#ic-pen /></svg> レビュー</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
       <div class="dbody">
         <div class="note" style="margin-bottom:14px">${w.title} / ${w.author}</div>
         <div class="field"><label>評価（星）</label><div class="rate" id="rateRow"></div></div>
@@ -1147,7 +1185,7 @@ function applyPage(animate=true){
   const frac = cur.pages>1 ? cur.page/(cur.pages-1) : 0;
   document.getElementById("progBar").style.width = (frac*100)+"%";
   const knob=document.getElementById("progKnob"); if(knob) knob.style.left = ((1-frac)*100)+"%";   // 右=最初, 左へ進む（縦書き右→左に合わせる）
-  document.getElementById("pageNo").textContent = `🔖 ${cur.page+1}/${cur.pages}・${Math.round(frac*100)}%`;
+  document.getElementById("pageNo").textContent = `${cur.page+1}/${cur.pages}・${Math.round(frac*100)}%`;
   if(cur.work){
     const r = rec(cur.work.id);
     r.fraction = frac; r.updated = isoNow();
@@ -1166,7 +1204,7 @@ function maybePromptReview(){
   if(rc){
     const recs = recommendFor(cur.work?cur.work.id:null, 3);
     rc.innerHTML = recs.length
-      ? `<div class="ft-recos-label">📚 こちらもおすすめ</div><div class="reco-row">`+recs.map(p=>recoCard(p.w,p.md,p.reason,false)).join("")+`</div>`
+      ? `<div class="ft-recos-label"><svg class=ic><use href=#ic-books /></svg> こちらもおすすめ</div><div class="reco-row">`+recs.map(p=>recoCard(p.w,p.md,p.reason,false)).join("")+`</div>`
       : "";
     rc.querySelectorAll("[data-wid]").forEach(el=> el.onclick=()=>{ const w=WORKS.find(x=>x.id===el.dataset.wid); if(w) openWork(w); });
   }
@@ -1566,7 +1604,7 @@ function hasKey(){ return !!geminiKey(); }
 const GEMINI_MODELS=["gemini-2.5-flash-lite","gemini-2.0-flash","gemini-2.5-flash"];
 async function openaiChat(messages, opts={}){
   const key=geminiKey();
-  if(!key) throw new Error("Gemini APIキーが未設定です。⚙️設定で無料キーを入れてください。");
+  if(!key) throw new Error("Gemini APIキーが未設定です。<svg class=ic><use href=#ic-settings /></svg>設定で無料キーを入れてください。");
   const sys = messages.filter(m=>m.role==="system").map(m=>m.content).join("\n\n");
   const userText = messages.filter(m=>m.role!=="system").map(m=>m.content).join("\n\n");
   const preferred = settings.chatModel || GEMINI_MODELS[0];
@@ -1611,7 +1649,7 @@ function openAI(tab){
   scrim.className="scrim"; scrim.onclick=(e)=>{ if(e.target===scrim) scrim.remove(); };
   scrim.innerHTML = `
     <div class="drawer" onclick="event.stopPropagation()">
-      <div class="dhead"><h3>📖 読む道具</h3>
+      <div class="dhead"><h3><svg class=ic><use href=#ic-book /></svg> 読む道具</h3>
         <button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
       <div class="ai-tabs">
         <button data-t="dict">辞書</button>
@@ -1636,9 +1674,9 @@ function renderAITab(){
       `<div class="field"><label>調べたい言葉</label>
         <input type="text" id="dictInput" value="${escapeAttr(sel)}" placeholder="言葉を入力、または本文をなぞって選択"
           onkeydown="if(event.key==='Enter')runDict()"></div>
-       <button class="btn-primary" onclick="runDict()">📖 辞書で調べる</button>
-       ${hasKey()? `<button class="btn-ghost" style="margin-top:8px" onclick="runExplain()">✨ AIで文脈に沿って解説</button>`:``}
-       <div class="note">Wiktionary・Wikipedia から意味を引きます（APIキー不要）。本文の語句をドラッグ選択 →「📖 意味を調べる」でもここに入ります。</div>
+       <button class="btn-primary" onclick="runDict()"><svg class=ic><use href=#ic-book /></svg> 辞書で調べる</button>
+       ${hasKey()? `<button class="btn-ghost" style="margin-top:8px" onclick="runExplain()"><svg class=ic><use href=#ic-sparkle /></svg> AIで文脈に沿って解説</button>`:``}
+       <div class="note">Wiktionary・Wikipedia から意味を引きます（APIキー不要）。本文の語句をドラッグ選択 →「<svg class=ic><use href=#ic-book /></svg> 意味を調べる」でもここに入ります。</div>
        <div class="ai-out placeholder" id="dictOut" style="margin-top:16px">難読語・古語・固有名詞などの意味を、その場ですぐ調べられます。</div>`;
     if(sel) runDict();
   } else if(aiTab==="summary"){
@@ -1649,7 +1687,7 @@ function renderAITab(){
       `<div class="note">${wk} ・ あらすじ／解説</div>
        ${info}
        <div class="ai-out" id="summaryOut" style="margin-top:12px">${escapeHtml(s)}</div>
-       ${hasKey()? `<button class="btn-ghost" style="margin-top:16px" onclick="runAISummary()">✨ AIで本文から要約し直す</button>`:``}`;
+       ${hasKey()? `<button class="btn-ghost" style="margin-top:16px" onclick="runAISummary()"><svg class=ic><use href=#ic-sparkle /></svg> AIで本文から要約し直す</button>`:``}`;
   } else if(aiTab==="era"){
     body.innerHTML =
       `<div class="note">${wk}</div>
@@ -1715,7 +1753,7 @@ async function runExplain(){   // AIによる文脈解説（キー必須）→ d
       {role:"system",content:"あなたは日本近代文学に精通した読書ガイドです。読者が読書中に出会った語句を、この文脈での意味に絞って簡潔にやさしく解説します。150字以内。"},
       {role:"user",content:`作品『${cur.work?.title}』（${cur.work?.author}）を読んでいます。語句「${term}」をこの文脈に沿って解説してください。\n\n文脈抜粋：${cur.plainText.slice(0,600)}`}
     ]);
-    setOut("dictOut", "✨ AI解説\n\n"+escapeHtml(out));
+    setOut("dictOut", "<svg class=ic><use href=#ic-sparkle /></svg> AI解説\n\n"+escapeHtml(out));
   }catch(e){ setOut("dictOut","エラー: "+e.message,"placeholder"); }
 }
 async function runAISummary(){
@@ -1910,7 +1948,7 @@ function openNotes(focusHid){
   scrim.onclick=(e)=>{ if(e.target===scrim) scrim.remove(); };
   scrim.innerHTML=`
     <div class="drawer" onclick="event.stopPropagation()">
-      <div class="dhead"><h3>🖍 ハイライト・メモ</h3>
+      <div class="dhead"><h3><svg class=ic><use href=#ic-highlight /></svg> ハイライト・メモ</h3>
         <button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
       <div class="dbody" id="notesBody"></div>
     </div>`;
@@ -1921,7 +1959,7 @@ function renderNotesBody(focusHid){
   const body=document.getElementById("notesBody"); if(!body) return;
   const arr=hlList();
   let html=`<button class="btn-ghost" style="margin-bottom:14px" onclick="addStandaloneMemo()">＋ メモを追加</button>`;
-  if(!arr.length) html+=`<div class="note">本文をなぞって「🖍 ハイライト」や「📝 メモ」を押すと、ここに一覧されます。読み返しやテスト対策に。</div>`;
+  if(!arr.length) html+=`<div class="note">本文をなぞって「<svg class=ic><use href=#ic-highlight /></svg> ハイライト」や「<svg class=ic><use href=#ic-pen /></svg> メモ」を押すと、ここに一覧されます。読み返しやテスト対策に。</div>`;
   arr.slice().reverse().forEach(h=>{
     const sw=HL_COLORS.map(([k,c])=>`<span class="swatch ${h.color===k?'on':''}" style="background:${c}" title="${k}" onclick="setHlColor('${h.hid}','${k}'); renderNotesBody()"></span>`).join("");
     html+=`<div class="note-item" id="ni-${h.hid}">
@@ -1963,24 +2001,24 @@ function openAsk(selText){
   const chips = askSelText ? `
       <div class="ask-quotes">${escapeHtml(trimLen(askSelText,160))}</div>
       <div class="ask-chips">
-        <button onclick="askQuick('現代語訳')">💬 現代語訳</button>
-        <button onclick="askQuick('語句の意味')">📖 語句の意味</button>
-        <button onclick="askQuick('表現の意図')">🧠 表現の意図</button>
-        <button onclick="askQuick('見どころ')">✨ 見どころ</button>
+        <button onclick="askQuick('現代語訳')"><svg class=ic><use href=#ic-chat /></svg> 現代語訳</button>
+        <button onclick="askQuick('語句の意味')"><svg class=ic><use href=#ic-book /></svg> 語句の意味</button>
+        <button onclick="askQuick('表現の意図')"><svg class=ic><use href=#ic-bulb /></svg> 表現の意図</button>
+        <button onclick="askQuick('見どころ')"><svg class=ic><use href=#ic-sparkle /></svg> 見どころ</button>
       </div>` : `
       <div class="ask-chips">
-        <button onclick="askQuick('テーマ')">🧠 テーマ</button>
-        <button onclick="askQuick('あらすじ')">📖 あらすじ</button>
-        <button onclick="askQuick('テスト')">📝 テストに出そうな点</button>
-        <button onclick="askQuick('作者')">✨ 作者の意図</button>
+        <button onclick="askQuick('テーマ')"><svg class=ic><use href=#ic-bulb /></svg> テーマ</button>
+        <button onclick="askQuick('あらすじ')"><svg class=ic><use href=#ic-book /></svg> あらすじ</button>
+        <button onclick="askQuick('テスト')"><svg class=ic><use href=#ic-pen /></svg> テストに出そうな点</button>
+        <button onclick="askQuick('作者')"><svg class=ic><use href=#ic-sparkle /></svg> 作者の意図</button>
       </div>`;
-  const notice = hasKey()? "" : `<div class="key-notice">💡 AIとの対話には <b>Gemini APIキー（無料・クレカ不要）</b> が必要です。<br>
-        <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">🔑 無料キーを取得（aistudio.google.com/apikey）</a> → Googleでログイン →「Create API key」でコピー。<br>
+  const notice = hasKey()? "" : `<div class="key-notice"><svg class=ic><use href=#ic-bulb /></svg> AIとの対話には <b>Gemini APIキー（無料・クレカ不要）</b> が必要です。<br>
+        <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600"><svg class=ic><use href=#ic-key /></svg> 無料キーを取得（aistudio.google.com/apikey）</a> → Googleでログイン →「Create API key」でコピー。<br>
         <span style="color:var(--sub);font-size:12px">※ キーはこの端末のブラウザ内にだけ保存され、外部には送られません（GoogleへのAPI通信を除く）。無料枠の範囲で使えます。共有PCではご注意を。</span>
-        <button class="btn-ghost" style="margin-top:9px" onclick="this.closest('.scrim').remove(); openSettings()">⚙️ 設定でキーを入れる</button></div>`;
+        <button class="btn-ghost" style="margin-top:9px" onclick="this.closest('.scrim').remove(); openSettings()"><svg class=ic><use href=#ic-settings /></svg> 設定でキーを入れる</button></div>`;
   scrim.innerHTML=`
     <div class="drawer" onclick="event.stopPropagation()">
-      <div class="dhead"><h3>💬 AIに聞く</h3>
+      <div class="dhead"><h3><svg class=ic><use href=#ic-chat /></svg> AIに聞く</h3>
         <button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
       <div class="dbody" style="display:flex; flex-direction:column">
         <div class="note">『${cur.work.title}』（${cur.work.author}）について、${askSelText?"選択箇所や":""}作品全体を質問できます。</div>
@@ -2014,7 +2052,7 @@ function askContext(){
 }
 async function askRun(question, label){
   if(!hasKey()){
-    askLog.push({q: label?label:question, a:"AIに質問するには、⚙️設定で Gemini の API キー（無料・クレカ不要）を入れてください。\n（語句の意味だけなら、本文を選択して「📖 辞書」で無料で調べられます。）"});
+    askLog.push({q: label?label:question, a:"AIに質問するには、<svg class=ic><use href=#ic-settings /></svg>設定で Gemini の API キー（無料・クレカ不要）を入れてください。\n（語句の意味だけなら、本文を選択して「<svg class=ic><use href=#ic-book /></svg> 辞書」で無料で調べられます。）"});
     renderAskLog(); return;
   }
   const entry={q: label?label:question, a:"", pending:true}; askLog.push(entry); renderAskLog();
@@ -2063,7 +2101,7 @@ function openSettings(){
   scrim.className="scrim center"; scrim.onclick=(e)=>{ if(e.target===scrim) scrim.remove(); };
   scrim.innerHTML = `
     <div class="modal" onclick="event.stopPropagation()">
-      <div class="dhead"><h3>⚙️ 設定</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
+      <div class="dhead"><h3><svg class=ic><use href=#ic-settings /></svg> 設定</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
       <div class="dbody">
         <div class="field"><label>テーマ</label>
           <div class="seg" id="segTheme">
@@ -2073,7 +2111,7 @@ function openSettings(){
           <input type="range" min="8" max="30" step="1" value="${settings.size}" style="width:100%" id="sizeRange">
           <div class="note">スマホでは 10〜14px あたりが目安です。</div>
         </div>
-        <div class="note" style="margin:-6px 0 18px">💡 ふりがな（総ルビ）は、読書画面の「ふりがな」ボタンで必要なときだけ付けられます。</div>
+        <div class="note" style="margin:-6px 0 18px"><svg class=ic><use href=#ic-bulb /></svg> ふりがな（総ルビ）は、読書画面の「ふりがな」ボタンで必要なときだけ付けられます。</div>
         <hr style="border:none;border-top:1px solid var(--line);margin:22px 0">
         <div class="field"><label>Gemini API キー（無料・任意）</label>
           <input type="password" id="keyInput" value="${escapeAttr(settings.geminiKey)}" placeholder="AIza... 未入力ならデモ動作">
@@ -2089,8 +2127,8 @@ function openSettings(){
         <hr style="border:none;border-top:1px solid var(--line);margin:22px 0">
         <div class="field"><label>データのバックアップ</label>
           <div class="seg">
-            <button onclick="exportData()">⬇ 書き出し</button>
-            <button onclick="document.getElementById('importFile').click()">⬆ 読み込み</button>
+            <button onclick="exportData()"><svg class=ic><use href=#ic-download /></svg> 書き出し</button>
+            <button onclick="document.getElementById('importFile').click()"><svg class=ic><use href=#ic-upload /></svg> 読み込み</button>
           </div>
           <input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(this)">
           <div class="note">しおり・ハイライト・メモ・レビュー・気になる・<b>読書統計（日数/時間/連続日数）</b>・テーマ設定を、1つのファイルに保存／復元します（端末やURLの引っ越し・機種変更にも）。定期的な書き出しをおすすめします。※APIキーは安全のため含まれません。</div>
@@ -2196,51 +2234,51 @@ function openHelp(){
   scrim.onclick=function(e){ if(e.target===scrim) scrim.remove(); };
   scrim.innerHTML=
     '<div class="modal" onclick="event.stopPropagation()">'+
-      '<div class="dhead"><h3>❓ 使い方</h3><button class="icon-btn close" onclick="this.closest(\'.scrim\').remove()">閉じる</button></div>'+
+      '<div class="dhead"><h3><svg class=ic><use href=#ic-help /></svg> 使い方</h3><button class="icon-btn close" onclick="this.closest(\'.scrim\').remove()">閉じる</button></div>'+
       '<div class="dbody help">'+
         '<p>青空文庫の名作を<b>“理解しながら読む”</b>ためのアプリです。<b>すべて無料</b>で使えます（AIとの対話には無料のGeminiキーが必要・クレカ不要）。</p>'+
 
-        '<h4>📖 読む</h4>'+
+        '<h4><svg class=ic><use href=#ic-book /></svg> 読む</h4>'+
         '<ul>'+
           '<li>棚で<b>作品をタップ</b>すると開きます。</li>'+
           '<li>ページをめくる：画面の<b>左右のボタン（‹ ›）</b>をタップ。矢印キーやマウスホイールでも（ホイールは一気に読み飛ばせます）。</li>'+
           '<li>一気に移動：下の<b>進捗バーをドラッグ</b>すると好きな位置へ飛べます。</li>'+
           '<li>読んだ位置は<b>自動でしおり保存</b>。次に開くと続きから。下のバーに現在位置(%)。</li>'+
-          '<li>文字サイズ・テーマ（和紙/白/夜）は<kbd>⚙️ 設定</kbd>で変更。</li>'+
+          '<li>文字サイズ・テーマ（和紙/白/夜）は<kbd><svg class=ic><use href=#ic-settings /></svg> 設定</kbd>で変更。</li>'+
         '</ul>'+
 
         '<h4>ふ ふりがな</h4>'+
         '<ul><li>読書画面の<kbd>ふ</kbd>ボタンで、難しい漢字にふりがなを付けます（もう一度で解除）。</li></ul>'+
 
-        '<h4>📚 調べる・💬 AIに聞く</h4>'+
+        '<h4><svg class=ic><use href=#ic-books /></svg> 調べる・<svg class=ic><use href=#ic-chat /></svg> AIに聞く</h4>'+
         '<ul>'+
-          '<li>本文を<b>長押し</b>すると語が選択され、そのまま<b>指を動かすと範囲を調整</b>できます（PCはドラッグ選択）。指を離すとメニュー：<b>🖍ハイライト／📝メモ／💬AIに聞く／📖辞書</b>。</li>'+
-          '<li>辞書は無料（Wiktionary・Wikipedia）。AIは作品全体にも質問でき、上部の<kbd>💬 AIに質問</kbd>から（テーマ／あらすじ／テスト対策 など）。</li>'+
+          '<li>本文を<b>長押し</b>すると語が選択され、そのまま<b>指を動かすと範囲を調整</b>できます（PCはドラッグ選択）。指を離すとメニュー：<b><svg class=ic><use href=#ic-highlight /></svg>ハイライト／<svg class=ic><use href=#ic-pen /></svg>メモ／<svg class=ic><use href=#ic-chat /></svg>AIに聞く／<svg class=ic><use href=#ic-book /></svg>辞書</b>。</li>'+
+          '<li>辞書は無料（Wiktionary・Wikipedia）。AIは作品全体にも質問でき、上部の<kbd><svg class=ic><use href=#ic-chat /></svg> AIに質問</kbd>から（テーマ／あらすじ／テスト対策 など）。</li>'+
         '</ul>'+
 
-        '<h4>🖍 記録する</h4>'+
+        '<h4><svg class=ic><use href=#ic-highlight /></svg> 記録する</h4>'+
         '<ul>'+
           '<li><b>ハイライト</b>：引いた箇所を<b>タップ</b>すると、色変更・メモ・削除ができます。</li>'+
-          '<li><b>メモ</b>・一覧は上部の<kbd>🖍 ノート</kbd>。<b>名文コレクション</b>(<kbd>📑 名文集</kbd>)は全作品の引用を横断表示。</li>'+
-          '<li><b>レビュー</b>(<kbd>📝</kbd>)で★と感想、<b>気になる</b>(<kbd>🔖</kbd>)であとで読む登録。</li>'+
+          '<li><b>メモ</b>・一覧は上部の<kbd><svg class=ic><use href=#ic-highlight /></svg> ノート</kbd>。<b>名文コレクション</b>(<kbd><svg class=ic><use href=#ic-collection /></svg> 名文集</kbd>)は全作品の引用を横断表示。</li>'+
+          '<li><b>レビュー</b>(<kbd><svg class=ic><use href=#ic-pen /></svg></kbd>)で★と感想、<b>気になる</b>(<kbd><svg class=ic><use href=#ic-bookmark /></svg></kbd>)であとで読む登録。</li>'+
         '</ul>'+
 
-        '<h4>🧭 選ぶ</h4>'+
+        '<h4><svg class=ic><use href=#ic-compass /></svg> 選ぶ</h4>'+
         '<ul>'+
           '<li>各作品に<b>難易度（●）</b>と<b>読了目安（分）</b>。並べ替え・「はじめての一冊」で選べます。</li>'+
-          '<li>棚の上に<b>次の一冊レコメンド</b>。<kbd>📊 統計</kbd>で読書の記録も見られます。</li>'+
+          '<li>棚の上に<b>次の一冊レコメンド</b>。<kbd><svg class=ic><use href=#ic-chart /></svg> 統計</kbd>で読書の記録も見られます。</li>'+
         '</ul>'+
 
-        '<h4>💾 便利機能</h4>'+
+        '<h4><svg class=ic><use href=#ic-save /></svg> 便利機能</h4>'+
         '<ul>'+
-          '<li><b>バックアップ</b>：<kbd>⚙️ 設定</kbd>でしおり・ハイライト等を書き出し／読み込み（端末の引っ越しに）。</li>'+
+          '<li><b>バックアップ</b>：<kbd><svg class=ic><use href=#ic-settings /></svg> 設定</kbd>でしおり・ハイライト等を書き出し／読み込み（端末の引っ越しに）。</li>'+
           '<li><b>ホーム画面に追加</b>すると、アプリのように起動でき、<b>一度読んだ作品はオフラインでも</b>読めます。</li>'+
         '</ul>'+
 
-        '<h4>🤖 AIを使うには</h4>'+
-        '<p>AIとの対話は、<kbd>⚙️ 設定</kbd>で<b>Geminiの無料APIキー</b>を入れると使えます（クレカ不要）。<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> でGoogleログイン→「Create API key」。キーは<b>この端末内だけ</b>に保存され、外部には送られません。</p>'+
+        '<h4><svg class=ic><use href=#ic-sparkle /></svg> AIを使うには</h4>'+
+        '<p>AIとの対話は、<kbd><svg class=ic><use href=#ic-settings /></svg> 設定</kbd>で<b>Geminiの無料APIキー</b>を入れると使えます（クレカ不要）。<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> でGoogleログイン→「Create API key」。キーは<b>この端末内だけ</b>に保存され、外部には送られません。</p>'+
 
-        '<div class="tip">💡 まずは「はじめての一冊」から一作開いて、わからない言葉をなぞって「📖辞書」を試してみてください。</div>'+
+        '<div class="tip"><svg class=ic><use href=#ic-bulb /></svg> まずは「はじめての一冊」から一作開いて、わからない言葉をなぞって「<svg class=ic><use href=#ic-book /></svg>辞書」を試してみてください。</div>'+
       '</div>'+
     '</div>';
   document.body.appendChild(scrim);
@@ -2260,6 +2298,11 @@ function openStats(){
   });
   const avg = reviews? (ratingSum/reviews).toFixed(1) : "—";
   const rs = readStats();
+  const months = monthlyStats(6);
+  const maxMo = Math.max(1, ...months.map(x=>x.min));
+  const monthBars = months.some(x=>x.min>0)
+    ? months.map(x=>`<div class="auth-bar"><span class="name">${x.label}</span><span class="track"><span class="fill" style="width:${Math.round(x.min/maxMo*100)}%"></span></span><span class="cnt">${x.min}分</span></div>`).join("")
+    : `<div class="note">読書した月ごとの時間が、ここにグラフで出ます。</div>`;
   const authors=Object.entries(authorCount).sort((a,b)=>b[1]-a[1]).slice(0,6);
   const maxA=authors.length?authors[0][1]:1;
   const bars=authors.map(([a,c])=>`<div class="auth-bar"><span class="name">${a}</span><span class="track"><span class="fill" style="width:${Math.round(c/maxA*100)}%"></span></span><span class="cnt">${c}</span></div>`).join("")
@@ -2267,12 +2310,12 @@ function openStats(){
   const scrim=document.createElement("div"); scrim.className="scrim center"; scrim.onclick=(e)=>{ if(e.target===scrim) scrim.remove(); };
   scrim.innerHTML=`
     <div class="modal" onclick="event.stopPropagation()">
-      <div class="dhead"><h3>📊 読書統計</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
+      <div class="dhead"><h3><svg class=ic><use href=#ic-chart /></svg> 読書統計</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
       <div class="dbody">
         <div class="stat-grid">
           <div class="stat-tile"><div class="num">${done}<small> / ${WORKS.length}</small></div><div class="lbl">読了した作品</div></div>
           <div class="stat-tile"><div class="num">${fmtHours(rs.totalMin)}</div><div class="lbl">実際の読書時間</div></div>
-          <div class="stat-tile"><div class="num">🔥 ${rs.streak}<small> 日</small></div><div class="lbl">連続読書日数</div></div>
+          <div class="stat-tile"><div class="num"><svg class=ic><use href=#ic-flame /></svg> ${rs.streak}<small> 日</small></div><div class="lbl">連続読書日数</div></div>
           <div class="stat-tile"><div class="num">${rs.days}<small> 日</small></div><div class="lbl">読書した日数</div></div>
           <div class="stat-tile"><div class="num">${doneThisYear}</div><div class="lbl">${thisYear}年の読了</div></div>
           <div class="stat-tile"><div class="num">${reading}</div><div class="lbl">読書中</div></div>
@@ -2280,6 +2323,8 @@ function openStats(){
           <div class="stat-tile"><div class="num">★${avg}</div><div class="lbl">平均評価（${reviews}件）</div></div>
           <div class="stat-tile"><div class="num">${fmtHours(minutes)}</div><div class="lbl">読了ぶんの目安時間</div></div>
         </div>
+        <div class="stat-head">月別の読書時間</div>
+        ${monthBars}
         <div class="stat-head">作者別 読了数</div>
         ${bars}
       </div>
@@ -2294,7 +2339,7 @@ function openCollection(){
   groups.sort((a,b)=> b.last.localeCompare(a.last));
   const total=groups.reduce((s,g)=>s+g.hs.length,0);
   let body;
-  if(!total){ body=`<div class="note">本文をなぞって「🖍 ハイライト」を引くと、心に残った一文がここに集まります。全作品を横断して読み返せます。</div>`; }
+  if(!total){ body=`<div class="note">本文をなぞって「<svg class=ic><use href=#ic-highlight /></svg> ハイライト」を引くと、心に残った一文がここに集まります。全作品を横断して読み返せます。</div>`; }
   else body = groups.map(g=>{
       const items=g.hs.slice().reverse().map(h=>`<div class="coll-quote">${escapeHtml(h.text)}</div>${h.note&&h.note.trim()?`<div class="coll-note">${escapeHtml(h.note)}</div>`:``}`).join("");
       return `<div class="coll-work" data-wid="${g.w.id}">『${g.w.title}』 ${g.w.author} ›</div>${items}`;
@@ -2302,7 +2347,7 @@ function openCollection(){
   const scrim=document.createElement("div"); scrim.className="scrim"; scrim.onclick=(e)=>{ if(e.target===scrim) scrim.remove(); };
   scrim.innerHTML=`
     <div class="drawer" onclick="event.stopPropagation()">
-      <div class="dhead"><h3>📑 名文コレクション${total?`（${total}）`:``}</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
+      <div class="dhead"><h3><svg class=ic><use href=#ic-collection /></svg> 名文コレクション${total?`（${total}）`:``}</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
       <div class="dbody">${body}</div>
     </div>`;
   document.body.appendChild(scrim);
