@@ -318,9 +318,37 @@
     .readbar{gap:10px; padding:0 12px}
     .readbar .rtitle{max-width:34vw}
   }
+  /* ---- カスタムアイコン（SVGスプライト・currentColorでテーマに追従） ---- */
+  .ic{width:1.12em;height:1.12em;display:inline-block;vertical-align:-.18em;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+  .icon-btn .ic{width:1.28em;height:1.28em;vertical-align:-.24em}
+  .ic .fillc{fill:currentColor;stroke:none}
 </style>
 </head>
 <body data-theme="washi">
+<!-- カスタムアイコン定義（線画スプライト） -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <symbol id="ic-book" viewBox="0 0 24 24"><path d="M12 6.2C10.3 5 8.2 4.5 5.8 4.5c-1 0-1.7.1-2.3.3v13.4c.6-.2 1.3-.3 2.3-.3 2.4 0 4.5.5 6.2 1.7M12 6.2c1.7-1.2 3.8-1.7 6.2-1.7 1 0 1.7.1 2.3.3v13.4c-.6-.2-1.3-.3-2.3-.3-2.4 0-4.5.5-6.2 1.7M12 6.2v13.4"/></symbol>
+  <symbol id="ic-chat" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 1 3.7 6.7L4 20l1.3-3.7A7.9 7.9 0 0 1 4 12Z"/><path d="M8.5 11.5h7M8.5 14h4.5"/></symbol>
+  <symbol id="ic-highlight" viewBox="0 0 24 24"><path d="M4 20l.6-3.4L14.6 6.6a2 2 0 0 1 2.8 0l1 1a2 2 0 0 1 0 2.8L8.4 20.4 4 20Z"/><path d="M13 8.2l2.8 2.8M4.6 16.6 8.4 20.4"/></symbol>
+  <symbol id="ic-pen" viewBox="0 0 24 24"><path d="M4 20l1-4L16.2 4.8a1.7 1.7 0 0 1 2.4 0l.6.6a1.7 1.7 0 0 1 0 2.4L8 19l-4 1Z"/><path d="M14.5 6.5l3 3"/></symbol>
+  <symbol id="ic-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.1"/><path d="M12 3v2.4M12 18.6V21M21 12h-2.4M5.4 12H3M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7M18.4 18.4l-1.7-1.7M7.3 7.3 5.6 5.6"/></symbol>
+  <symbol id="ic-bookmark" viewBox="0 0 24 24"><path d="M7 4h10a1 1 0 0 1 1 1v15l-6-4-6 4V5a1 1 0 0 1 1-1Z"/></symbol>
+  <symbol id="ic-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.7 5.1a3 3 0 0 0 2.2 2.2L21 12l-5.1 1.7a3 3 0 0 0-2.2 2.2L12 21l-1.7-5.1a3 3 0 0 0-2.2-2.2L3 12l5.1-1.7a3 3 0 0 0 2.2-2.2L12 3Z"/></symbol>
+  <symbol id="ic-chart" viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/></symbol>
+  <symbol id="ic-collection" viewBox="0 0 24 24"><path d="M7 3.5h7L18.5 8v11a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5Z"/><path d="M14 3.5V8h4.5M9 12.5h5M9 15.5h3.5"/></symbol>
+  <symbol id="ic-bulb" viewBox="0 0 24 24"><path d="M9.5 18h5M10.3 21h3.4M12 3a6 6 0 0 0-3.8 10.6c.8.7 1.3 1.4 1.3 2.4h5c0-1 .5-1.7 1.3-2.4A6 6 0 0 0 12 3Z"/></symbol>
+  <symbol id="ic-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.2-2.7 4"/><circle cx="12" cy="17.2" r=".95" class="fillc"/></symbol>
+  <symbol id="ic-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.3V12l3.2 2"/></symbol>
+  <symbol id="ic-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M15.6 8.4l-2 5.2-5.2 2 2-5.2 5.2-2Z"/></symbol>
+  <symbol id="ic-books" viewBox="0 0 24 24"><rect x="4" y="4.5" width="3.6" height="15" rx=".6"/><rect x="9" y="4.5" width="3.6" height="15" rx=".6"/><path d="M15 6l3.3.9-3 11.7-3.3-.9"/></symbol>
+  <symbol id="ic-key" viewBox="0 0 24 24"><circle cx="8" cy="12" r="3.6"/><path d="M11.6 12H20M17 12v3M20 12v2.4"/></symbol>
+  <symbol id="ic-save" viewBox="0 0 24 24"><path d="M5.5 4.5H16L19.5 8v10.5a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1V5.5a1 1 0 0 1 1-1Z"/><path d="M8 4.5v4h6v-4M8 19.5v-5h8v5"/></symbol>
+  <symbol id="ic-download" viewBox="0 0 24 24"><path d="M12 4v10M8 10.5l4 4 4-4M5 19.5h14"/></symbol>
+  <symbol id="ic-upload" viewBox="0 0 24 24"><path d="M12 15.5V5.5M8 9.5l4-4 4 4M5 19.5h14"/></symbol>
+  <symbol id="ic-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M6.5 7l1 12a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1l1-12M10 11v6M14 11v6"/></symbol>
+  <symbol id="ic-flame" viewBox="0 0 24 24"><path d="M12 3c.9 2.8-1.3 3.9-1.3 6.2 0 1 .6 1.7 1.3 1.7s1.3-.7 1.3-1.7c1 .8 2.2 2.4 2.2 4.4a5.5 5.5 0 0 1-11 0c0-2.7 1.9-4.4 3-5.9C8.7 6.3 9 4.5 9 3c1 .6 2.4 1.8 3 3.5.5-1.3.4-2.6 0-3.5Z"/></symbol>
+  <symbol id="ic-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+</defs></svg>
 
 <!-- ========== TOP BAR ========== -->
 <div class="topbar">
@@ -329,16 +357,16 @@
     <span class="sub">SHIORI &nbsp;/&nbsp; 青空文庫コンシェルジュ</span>
   </div>
   <div class="spacer"></div>
-  <button class="icon-btn" id="btn-ask" onclick="openAsk()" title="AIに質問" hidden>💬<span class="btl"> AIに質問</span></button>
-  <button class="icon-btn" id="btn-notes" onclick="openNotes()" title="ハイライト・メモ" hidden>🖍<span class="btl"> ノート</span></button>
-  <button class="icon-btn" id="btn-summary" onclick="openAI('summary')" title="あらすじ・解説" hidden>📖<span class="btl"> あらすじ</span></button>
-  <button class="icon-btn" id="btn-check" onclick="toggleCheckReader()" title="気になる（あとで読む）に登録" hidden>🔖<span class="btl"> 気になる</span></button>
-  <button class="icon-btn" id="btn-review" onclick="openReview(cur.work&&cur.work.id)" title="レビュー" hidden>📝<span class="btl"> レビュー</span></button>
+  <button class="icon-btn" id="btn-ask" onclick="openAsk()" title="AIに質問" hidden><svg class=ic><use href=#ic-chat /></svg><span class="btl"> AIに質問</span></button>
+  <button class="icon-btn" id="btn-notes" onclick="openNotes()" title="ハイライト・メモ" hidden><svg class=ic><use href=#ic-highlight /></svg><span class="btl"> ノート</span></button>
+  <button class="icon-btn" id="btn-summary" onclick="openAI('summary')" title="あらすじ・解説" hidden><svg class=ic><use href=#ic-book /></svg><span class="btl"> あらすじ</span></button>
+  <button class="icon-btn" id="btn-check" onclick="toggleCheckReader()" title="気になる（あとで読む）に登録" hidden><svg class=ic><use href=#ic-bookmark /></svg><span class="btl"> 気になる</span></button>
+  <button class="icon-btn" id="btn-review" onclick="openReview(cur.work&&cur.work.id)" title="レビュー" hidden><svg class=ic><use href=#ic-pen /></svg><span class="btl"> レビュー</span></button>
   <button class="icon-btn" id="btn-ruby" onclick="toggleRuby()" title="ふりがな（総ルビ）" hidden>ふ<span class="btl"> ふりがな</span></button>
-  <button class="icon-btn" id="btn-stats" onclick="openStats()" title="読書統計">📊<span class="btl"> 統計</span></button>
-  <button class="icon-btn" id="btn-collection" onclick="openCollection()" title="名文コレクション">📑<span class="btl"> 名文集</span></button>
-  <button class="icon-btn" onclick="openHelp()" title="使い方・ヘルプ">❓<span class="btl"> 使い方</span></button>
-  <button class="icon-btn" onclick="openSettings()" title="設定">⚙️<span class="btl"> 設定</span></button>
+  <button class="icon-btn" id="btn-stats" onclick="openStats()" title="読書統計"><svg class=ic><use href=#ic-chart /></svg><span class="btl"> 統計</span></button>
+  <button class="icon-btn" id="btn-collection" onclick="openCollection()" title="名文コレクション"><svg class=ic><use href=#ic-collection /></svg><span class="btl"> 名文集</span></button>
+  <button class="icon-btn" onclick="openHelp()" title="使い方・ヘルプ"><svg class=ic><use href=#ic-help /></svg><span class="btl"> 使い方</span></button>
+  <button class="icon-btn" onclick="openSettings()" title="設定"><svg class=ic><use href=#ic-settings /></svg><span class="btl"> 設定</span></button>
 </div>
 
 <!-- ========== LIBRARY ========== -->
@@ -368,8 +396,13 @@
         <option value="done">読了</option>
         <option value="unread">未読</option>
       </select>
+      <select id="genreSel" onchange="setGenre(this.value)">
+        <option value="all">ジャンル：すべて</option>
+        <option value="文学">日本文学</option>
+        <option value="童話">童話・世界の名作</option>
+      </select>
       <button class="chipbtn" id="begBtn" onclick="toggleBeginner()">◎ はじめての一冊</button>
-      <button class="chipbtn" id="checkBtn" onclick="toggleChecked()">🔖 気になる</button>
+      <button class="chipbtn" id="checkBtn" onclick="toggleChecked()"><svg class=ic><use href=#ic-bookmark /></svg> 気になる</button>
     </div>
     <div id="recos" class="recos hidden"></div>
     <div class="lib-count" id="libCount"></div>
@@ -392,8 +425,8 @@
   </div>
   <div class="finish-toast hidden" id="finishToast">
     <div class="ft-top">
-      <span>『<span id="ftBookTitle"></span>』を読み終えました 🎉</span>
-      <button class="ft-close" onclick="dismissFinish()" aria-label="閉じる">✕</button>
+      <span>『<span id="ftBookTitle"></span>』を読み終えました <svg class=ic><use href=#ic-sparkle /></svg></span>
+      <button class="ft-close" onclick="dismissFinish()" aria-label="閉じる"><svg class=ic><use href=#ic-close /></svg></button>
     </div>
     <div class="ft-recos" id="ftRecos"></div>
     <div class="ft-actions">
@@ -404,15 +437,15 @@
 </div>
 
 <div id="seltip" class="hidden" onmousedown="event.preventDefault()">
-  <button onclick="selHighlight()" title="ハイライト">🖍<span>ハイライト</span></button>
-  <button onclick="selMemo()" title="メモ">📝<span>メモ</span></button>
-  <button onclick="selAsk()" title="AIに聞く">💬<span>AIに聞く</span></button>
-  <button onclick="lookupSelection()" title="辞書で調べる">📖<span>辞書</span></button>
+  <button onclick="selHighlight()" title="ハイライト"><svg class=ic><use href=#ic-highlight /></svg><span>ハイライト</span></button>
+  <button onclick="selMemo()" title="メモ"><svg class=ic><use href=#ic-pen /></svg><span>メモ</span></button>
+  <button onclick="selAsk()" title="AIに聞く"><svg class=ic><use href=#ic-chat /></svg><span>AIに聞く</span></button>
+  <button onclick="lookupSelection()" title="辞書で調べる"><svg class=ic><use href=#ic-book /></svg><span>辞書</span></button>
 </div>
 <div id="hltip" class="hidden" onmousedown="event.preventDefault()">
-  <button onclick="hlMemo()" title="メモ">📝<span>メモ</span></button>
-  <button onclick="hlCycleColor()" title="色を変える">🎨<span>色</span></button>
-  <button class="del" onclick="hlDelete()" title="ハイライトを削除">🗑<span>削除</span></button>
+  <button onclick="hlMemo()" title="メモ"><svg class=ic><use href=#ic-pen /></svg><span>メモ</span></button>
+  <button onclick="hlCycleColor()" title="色を変える"><svg class=ic><use href=#ic-sparkle /></svg><span>色</span></button>
+  <button class="del" onclick="hlDelete()" title="ハイライトを削除"><svg class=ic><use href=#ic-trash /></svg><span>削除</span></button>
 </div>
 
 <script>
@@ -568,6 +601,33 @@ const WORKS = [
   {id:"nekomachi", title:"猫町", author:"萩原朔太郎", file:"000067/files/641_21647.html"},
   {id:"cement", title:"セメント樽の中の手紙", author:"葉山嘉樹", file:"000031/files/228_21664.html"},
   {id:"byosho", title:"病牀六尺", author:"正岡子規", file:"000305/files/43537_41508.html"},
+  // ── 童話・世界の名作（青空文庫の著作権切れ翻訳。ディズニー等の元ネタ） ──
+  {id:"ningyohime",    title:"人魚姫",     author:"アンデルセン", file:"000019/files/42383_21527.html", category:"童話"}, // 楠山正雄訳「人魚のひいさま」
+  {id:"akaikutsu",     title:"赤いくつ",   author:"アンデルセン", file:"000019/files/42378_18502.html", category:"童話"}, // 楠山正雄訳
+  {id:"matchuri",      title:"マッチ売りの少女", author:"アンデルセン", file:"000019/files/194_23024.html", category:"童話"}, // 大久保ゆう訳
+  {id:"rapunzel",      title:"ラプンツェル", author:"グリム",     file:"001091/files/42309_18060.html", category:"童話"}, // 中島孤島訳
+  {id:"shirayukihime", title:"白雪姫",     author:"グリム",     file:"001091/files/42308_17916.html", category:"童話"}, // 菊池寛訳
+  {id:"cinderella",    title:"シンデレラ", author:"グリム",     file:"001091/files/46344_23172.html", category:"童話"}, // 大久保ゆう訳「アッシェンプッテル」
+  {id:"yukino_joou", title:"雪の女王", author:"アンデルセン", file:"000019/files/42387_20568.html", category:"童話"},
+  {id:"minikui", title:"みにくいアヒルの子", author:"アンデルセン", file:"000019/files/58875_69752.html", category:"童話"},
+  {id:"hadaka", title:"はだかの王さま", author:"アンデルセン", file:"000019/files/60190_73009.html", category:"童話"},
+  {id:"suzuno", title:"すずの兵隊", author:"アンデルセン", file:"000019/files/42379_21528.html", category:"童話"},
+  {id:"nonohakucho", title:"野のはくちょう", author:"アンデルセン", file:"000019/files/42384_21526.html", category:"童話"},
+  {id:"soratobu", title:"空とぶトランク", author:"アンデルセン", file:"000019/files/58874_70966.html", category:"童話"},
+  {id:"nightingale", title:"ナイチンゲール", author:"アンデルセン", file:"000019/files/58849_66988.html", category:"童話"},
+  {id:"momino", title:"もみの木", author:"アンデルセン", file:"000019/files/44423_21529.html", category:"童話"},
+  {id:"hansel", title:"ヘンゼルとグレーテル", author:"グリム", file:"001091/files/42315_15931.html", category:"童話"},
+  {id:"akazukin", title:"赤ずきん", author:"グリム", file:"001091/files/42311_15546.html", category:"童話"},
+  {id:"bremen", title:"ブレーメンの音楽隊", author:"グリム", file:"001091/files/42314_15929.html", category:"童話"},
+  {id:"ookami7", title:"おおかみと七ひきのこやぎ", author:"グリム", file:"001091/files/42312_15547.html", category:"童話"},
+  {id:"kaeru_ou", title:"かえるの王さま", author:"グリム", file:"001091/files/42313_15548.html", category:"童話"},
+  {id:"hoshino_ginka", title:"星の銀貨", author:"グリム", file:"001091/files/42316_15930.html", category:"童話"},
+  {id:"nanawa_karasu", title:"七羽のカラス", author:"グリム", file:"001091/files/59839_72673.html", category:"童話"},
+  {id:"muttsu_hakucho", title:"六羽の白鳥", author:"グリム", file:"001091/files/46167_47814.html", category:"童話"},
+  {id:"rumpel", title:"ルンペルシュティルツヒェン", author:"グリム", file:"001091/files/42310_15932.html", category:"童話"},
+  {id:"nagagutsu", title:"長靴をはいた猫", author:"ペロー", file:"001134/files/43118_21538.html", category:"童話"},
+  {id:"nemureru", title:"眠れる森の美女", author:"ペロー", file:"001134/files/43119_21539.html", category:"童話"},
+  {id:"aohige", title:"青ひげ", author:"ペロー", file:"001134/files/43117_21536.html", category:"童話"},
 ];
 
 /* あらすじ・解説（各作品を読んで書き下ろし。ネタバレ控えめ） */
@@ -703,10 +763,36 @@ const SUMMARIES = {
   nekomachi:"方向感覚を失ったとき、見慣れた町の裏側に「別の世界」が現れる——散歩の果てに迷い込んだ町で、「私」は突然、無数の猫が満ちる異様な光景を目にする。詩人の幻想散文。",
   cement:"セメント樽の中から出てきた一枚の手紙。それは、恋人を工場の機械で失い、その遺骨がセメントに混じったと訴える女工のものだった。労働者の悲哀を描くプロレタリア文学の名品。",
   byosho:"「病牀六尺、これが我世界である」。脊椎カリエスで寝たきりとなった子規が、死の直前まで書きつづった随筆。病苦のなかでも失われない鋭い観察眼と、生への強い意欲がにじむ。",
+  ningyohime:"海の底に住む人魚の末の姫は、嵐で溺れかけた人間の王子に恋をする。美しい声と引きかえに人間の足を得て地上へ上がるが、王子の心は別の娘へと向かう——。自らを犠牲にする純愛と報われぬ切なさを描いた、アンデルセンの代表作。ディズニー『リトル・マーメイド』の原作。",
+  akaikutsu:"赤い靴に心を奪われた少女カーレン。見栄と虚栄からその靴を履いて教会へ向かうと、靴はひとりでに踊りだし、脱ぐことも止めることもできなくなる。欲望への戒めを、残酷なまでに鮮烈な幻想で描くアンデルセンの寓話。",
+  matchuri:"大晦日の凍える街角で、はだしのままマッチを売る少女。売れずには家に帰れない彼女は、暖をとろうと一本ずつマッチを擦る。その小さな炎の中に、あたたかな幻が次々と浮かんでは消えてゆく。貧しさと祈りを静かに描くアンデルセンの名短編。",
+  rapunzel:"魔女にさらわれ、窓のない塔のてっぺんに閉じこめられた、長い髪の娘ラプンツェル。垂らした髪をつたって登ってくる王子との出会いが、二人の運命を大きく動かしてゆく。長い髪・高い塔・魔女——ディズニー『塔の上のラプンツェル』の原作となったグリム童話。",
+  shirayukihime:"雪のように白い肌を持つ王女・白雪姫。その美しさに嫉妬する継母の王妃は、鏡に「世界でいちばん美しいのは誰か」と問い続ける。毒りんご、七人の小人、ガラスの棺——誰もが知る名場面を生んだ、グリム童話の代表作。",
+  cinderella:"継母と義姉たちにこき使われ、灰まみれで働く娘・灰かぶり。お城の舞踏会の夜、不思議な助けを得て見違えるほど美しく着飾るが、急いで帰る途中に残していったのは、片方の靴だけだった。ディズニー『シンデレラ』の原型となったグリム童話（原題「アッシェンプッテル」）。",
+  yukino_joou:"悪魔の鏡のかけらが目と心に刺さり、人が変わってしまった少年カイ。彼を連れ去った雪の女王を追って、幼なじみの少女ゲルダは長い旅に出る。ディズニー『アナと雪の女王』の着想のもととなった、アンデルセンの長編童話。",
+  minikui:"アヒルの群れの中で、一羽だけ姿の違う「みにくい」ひな。いじめられ、居場所を失って各地をさまようが、やがて水面に映った自分の本当の姿を知る。アンデルセン自身の人生も重なる、成長と自己肯定の物語。",
+  hadaka:"「愚か者には見えない」という不思議な布——それを着物に仕立てさせた見栄っぱりの王さまが、堂々と行列に繰り出す。誰も本当のことを言えないなか、ひとりの子どもが叫んだ一言。権威と虚栄を笑うアンデルセンの寓話。",
+  suzuno:"片足だけのすずの兵隊は、紙の踊り子にひそかに恋をする。窓から落ち、どぶを流れ、魚に呑まれても、彼はまっすぐな心を失わない。逆境にも動じない健気さを描く、アンデルセンの名短編。",
+  nonohakucho:"継母の呪いで、十一人の兄たちは白鳥に変えられてしまう。妹エリサは、口をきくことを禁じられながら、兄たちを救うためイラクサを黙々と編み続ける。献身と忍耐を描くアンデルセンの童話。",
+  soratobu:"空を飛ぶ不思議なトランクを手に入れた商人の息子。それに乗って遠い国の塔へ舞い降り、お姫さまの前でおとぎ話を語って心をつかむが——。機知と、はかない幸運を描くアンデルセンの物語。",
+  nightingale:"中国の皇帝を、その歌声で涙させた一羽の夜うぐいす。やがて宝石づくりの機械仕掛けの鳥が現れ、本物は忘れられてしまう。だが皇帝が死の淵に立ったとき——。本物の価値を問うアンデルセンの名作。",
+  momino:"早く大きくなりたい、早くここを出たいと願い続けた一本のもみの木。クリスマスに飾られる栄光の夜を迎えるが、「今」を生きられなかった木を待つ結末は切ない。時の流れと足るを知ることを説くアンデルセンの童話。",
+  hansel:"貧しさから森に置き去りにされた兄妹ヘンゼルとグレーテル。たどり着いたのはお菓子でできた家——そこに住む恐ろしい魔女の罠だった。知恵で切り抜ける、グリムの代表作。",
+  akazukin:"赤ずきんの女の子が、おばあさんのお見舞いに森を行く。だがひと足先に家へ着いた狼が、おばあさんに化けて待ち受けていた。「どうしてそんなに大きなお口なの？」——誰もが知るグリム童話。",
+  bremen:"年老いて役立たずと見なされたロバ・犬・猫・にわとり。音楽隊を目指してブレーメンへ向かう道中、彼らは知恵と協力で泥棒たちを追い払う。弱きものたちの痛快な物語、グリム童話。",
+  ookami7:"母やぎの留守中、「戸を開けてはいけない」と言いつけられた七ひきの子やぎ。だが狼はあの手この手で母のふりをして忍び込む。呑み込まれた子やぎたちの運命は——。スリルと機転のグリム童話。",
+  kaeru_ou:"泉に落とした金の毬を、みにくいカエルが拾ってくれる。代わりの願いを渋々きくお姫さまだが、カエルの正体は思いがけないものだった。約束の意味を説く、グリム童話集の巻頭を飾る一編。",
+  hoshino_ginka:"身寄りもなく、着るものさえ持たない貧しい少女。それでも出会う人ごとに、なけなしのパンや服を分け与えていく。すべてを失った彼女に、天から降りそそいだもの——。無償のやさしさを描くグリムの小品。",
+  nanawa_karasu:"父の何気ない言葉から、七人の兄たちはカラスに姿を変えられてしまう。生まれた妹は、兄たちを救うため世界の果てまで旅をする。家族への愛を描くグリム童話。",
+  muttsu_hakucho:"魔法で白鳥に変えられた六人の兄。妹は六年のあいだ口をきかず、星の花で肌着を縫い続けて兄たちを救おうとする。沈黙と忍耐の献身を描くグリム童話。",
+  rumpel:"わらを金に紡げと無理難題を課された娘。小人が手を貸す代わりに求めたのは、生まれてくる我が子だった。娘を救うのは、小人の「名前」を言い当てること——。名前当ての緊張感が光るグリム童話。",
+  nagagutsu:"父の遺産としてただ一匹の猫だけを受け継いだ貧しい三男。ところがこの猫、長靴をはき、知恵とはったりで主人を「侯爵」に仕立て上げ、王女との縁まで取り持ってしまう。痛快な出世物語、ペローの名作。",
+  nemureru:"祝いの席に招かれなかった魔女の呪いで、姫は糸車の針に刺さり百年の眠りにつく。いばらに閉ざされた城で眠り続ける姫を、目覚めさせるものは——。ディズニー『眠れる森の美女』の原作、ペロー版。",
+  aohige:"青いひげの大金持ちに嫁いだ娘。夫は留守中、「この部屋だけは開けてはいけない」と鍵を渡す。好奇心に負けて扉を開けた先で、娘が見たものとは——。禁じられた部屋の戦慄を描くペローの寓話。",
 };
 
 /* 各作品の実測メタ（本文を取得して計測）: min=読了目安(分) diff=難易度1-5 beginner=はじめて向き */
-const META = {"rashomon":{"min":13,"diff":2,"beginner":true},"kumonoito":{"min":6,"diff":2,"beginner":true},"toshishun":{"min":20,"diff":3,"beginner":false},"jigokuhen":{"min":59,"diff":5,"beginner":false},"yabunonaka":{"min":19,"diff":1,"beginner":true},"kappa":{"min":83,"diff":1,"beginner":false},"imogayu":{"min":32,"diff":3,"beginner":false},"hana_a":{"min":13,"diff":2,"beginner":true},"mikan":{"min":7,"diff":4,"beginner":false},"torokko":{"min":10,"diff":2,"beginner":true},"meros":{"min":22,"diff":1,"beginner":true},"ningen":{"min":161,"diff":2,"beginner":false},"shayo":{"min":197,"diff":1,"beginner":false},"fugaku":{"min":33,"diff":2,"beginner":false},"viyon":{"min":45,"diff":2,"beginner":false},"joshi":{"min":69,"diff":1,"beginner":false},"kakekomi":{"min":30,"diff":1,"beginner":false},"outo":{"min":11,"diff":1,"beginner":true},"otogi":{"min":157,"diff":4,"beginner":false},"kokoro":{"min":356,"diff":2,"beginner":false},"neko":{"min":708,"diff":2,"beginner":false},"botchan":{"min":196,"diff":2,"beginner":false},"sanshiro":{"min":354,"diff":4,"beginner":false},"sorekara":{"min":382,"diff":2,"beginner":false},"mon":{"min":299,"diff":5,"beginner":false},"kusamakura":{"min":187,"diff":2,"beginner":false},"yumejuya":{"min":35,"diff":2,"beginner":false},"ginga":{"min":85,"diff":1,"beginner":false},"chumon":{"min":12,"diff":1,"beginner":true},"gauche":{"min":26,"diff":1,"beginner":false},"matasaburo":{"min":67,"diff":1,"beginner":false},"yodaka":{"min":11,"diff":1,"beginner":true},"donguri":{"min":14,"diff":2,"beginner":false},"otsuberu":{"min":13,"diff":1,"beginner":true},"budori":{"min":56,"diff":1,"beginner":false},"maihime":{"min":34,"diff":5,"beginner":false},"takasebune":{"min":19,"diff":5,"beginner":false},"sansho":{"min":49,"diff":1,"beginner":false},"gan":{"min":163,"diff":2,"beginner":false},"lemon":{"min":11,"diff":2,"beginner":true},"sakura":{"min":4,"diff":1,"beginner":true},"sangetsu":{"min":13,"diff":2,"beginner":true},"meijin":{"min":12,"diff":5,"beginner":false},"deshi":{"min":53,"diff":2,"beginner":false},"riryo":{"min":75,"diff":3,"beginner":false},"takekurabe":{"min":64,"diff":5,"beginner":false},"nigorie":{"min":45,"diff":4,"beginner":false},"jusanya":{"min":28,"diff":5,"beginner":false},"daraku":{"min":17,"diff":3,"beginner":false},"hakuchi":{"min":51,"diff":3,"beginner":false},"koya":{"min":77,"diff":4,"beginner":false},"geka":{"min":16,"diff":2,"beginner":true},"gongitsune":{"min":11,"diff":1,"beginner":true},"tebukuro":{"min":8,"diff":1,"beginner":true},"akairousoku":{"min":14,"diff":1,"beginner":true},"tsukiyo":{"min":8,"diff":1,"beginner":true},"hae":{"min":8,"diff":2,"beginner":true},"harubasha":{"min":24,"diff":1,"beginner":false},"musashino":{"min":34,"diff":3,"beginner":false},"kanikosen":{"min":136,"diff":1,"beginner":false},"onshu":{"min":50,"diff":2,"beginner":false},"kazetachinu":{"min":121,"diff":2,"beginner":false},"hitofusa":{"min":14,"diff":1,"beginner":true},"chikyu":{"min":185,"diff":2,"beginner":false},"yoake":{"min":455,"diff":3,"beginner":false},"sumida":{"min":77,"diff":3,"beginner":false},"haguruma":{"min":56,"diff":3,"beginner":false},"ahou":{"min":27,"diff":3,"beginner":false},"hokyonin":{"min":21,"diff":3,"beginner":false},"gesaku":{"min":46,"diff":1,"beginner":false},"butokai":{"min":11,"diff":4,"beginner":false},"majutsu":{"min":16,"diff":2,"beginner":true},"sarukani":{"min":5,"diff":3,"beginner":false},"aki":{"min":25,"diff":3,"beginner":false},"rokunomiya":{"min":13,"diff":3,"beginner":false},"tsugaru":{"min":247,"diff":3,"beginner":false},"chikuken":{"min":27,"diff":1,"beginner":false},"goodbye":{"min":33,"diff":1,"beginner":false},"tokaton":{"min":28,"diff":2,"beginner":false},"romanesque":{"min":41,"diff":1,"beginner":false},"gyofuku":{"min":11,"diff":1,"beginner":true},"tokyo8":{"min":46,"diff":2,"beginner":false},"higan":{"min":433,"diff":3,"beginner":false},"kojin":{"min":493,"diff":2,"beginner":false},"garasudo":{"min":116,"diff":2,"beginner":false},"buncho":{"min":23,"diff":2,"beginner":false},"abe":{"min":61,"diff":3,"beginner":false},"saigo":{"min":20,"diff":5,"beginner":false},"kanzan":{"min":13,"diff":4,"beginner":false},"moso":{"min":30,"diff":3,"beginner":false},"nametoko":{"min":16,"diff":1,"beginner":true},"tsuchigami":{"min":21,"diff":1,"beginner":true},"hyoga":{"min":13,"diff":2,"beginner":false},"cairo":{"min":21,"diff":1,"beginner":true},"kainohi":{"min":32,"diff":1,"beginner":false},"otsugomori":{"min":22,"diff":5,"beginner":false},"wakaremichi":{"min":15,"diff":5,"beginner":false},"mojika":{"min":14,"diff":2,"beginner":true},"gojo":{"min":42,"diff":2,"beginner":false},"gojotan":{"min":28,"diff":2,"beginner":false},"fuyunohi":{"min":24,"diff":2,"beginner":false},"yaminoemaki":{"min":8,"diff":1,"beginner":true},"aibu":{"min":6,"diff":1,"beginner":true},"utaandon":{"min":79,"diff":2,"beginner":false},"kusameikyu":{"min":157,"diff":2,"beginner":false},"sakuranomori":{"min":37,"diff":1,"beginner":false},"kazehakase":{"min":12,"diff":2,"beginner":true},"bunkashikan":{"min":48,"diff":3,"beginner":false},"hananoki":{"min":21,"diff":1,"beginner":true},"nobara":{"min":5,"diff":1,"beginner":true},"cain":{"min":71,"diff":2,"beginner":false},"chisaki":{"min":22,"diff":2,"beginner":false},"wasureenu":{"min":21,"diff":2,"beginner":true},"gyuniku":{"min":35,"diff":3,"beginner":false},"harunotori":{"min":17,"diff":2,"beginner":true},"kikai":{"min":48,"diff":3,"beginner":false},"atama":{"min":6,"diff":3,"beginner":false},"utsukushii":{"min":95,"diff":2,"beginner":false},"seikazoku":{"min":35,"diff":2,"beginner":false},"oshie":{"min":130,"diff":3,"beginner":false},"shojo":{"min":232,"diff":3,"beginner":false},"meotozenzai":{"min":68,"diff":3,"beginner":false},"futon":{"min":99,"diff":3,"beginner":false},"ippeisotsu":{"min":25,"diff":2,"beginner":false},"ukigumo":{"min":251,"diff":3,"beginner":false},"gojunoto":{"min":125,"diff":3,"beginner":false},"konjiki":{"min":557,"diff":4,"beginner":false},"younenjidai":{"min":68,"diff":1,"beginner":false},"nekomachi":{"min":23,"diff":3,"beginner":false},"cement":{"min":6,"diff":1,"beginner":true},"byosho":{"min":194,"diff":4,"beginner":false}};
+const META = {"rashomon":{"min":13,"diff":2,"beginner":true},"kumonoito":{"min":6,"diff":2,"beginner":true},"toshishun":{"min":20,"diff":3,"beginner":false},"jigokuhen":{"min":59,"diff":5,"beginner":false},"yabunonaka":{"min":19,"diff":1,"beginner":true},"kappa":{"min":83,"diff":1,"beginner":false},"imogayu":{"min":32,"diff":3,"beginner":false},"hana_a":{"min":13,"diff":2,"beginner":true},"mikan":{"min":7,"diff":4,"beginner":false},"torokko":{"min":10,"diff":2,"beginner":true},"meros":{"min":22,"diff":1,"beginner":true},"ningen":{"min":161,"diff":2,"beginner":false},"shayo":{"min":197,"diff":1,"beginner":false},"fugaku":{"min":33,"diff":2,"beginner":false},"viyon":{"min":45,"diff":2,"beginner":false},"joshi":{"min":69,"diff":1,"beginner":false},"kakekomi":{"min":30,"diff":1,"beginner":false},"outo":{"min":11,"diff":1,"beginner":true},"otogi":{"min":157,"diff":4,"beginner":false},"kokoro":{"min":356,"diff":2,"beginner":false},"neko":{"min":708,"diff":2,"beginner":false},"botchan":{"min":196,"diff":2,"beginner":false},"sanshiro":{"min":354,"diff":4,"beginner":false},"sorekara":{"min":382,"diff":2,"beginner":false},"mon":{"min":299,"diff":5,"beginner":false},"kusamakura":{"min":187,"diff":2,"beginner":false},"yumejuya":{"min":35,"diff":2,"beginner":false},"ginga":{"min":85,"diff":1,"beginner":false},"chumon":{"min":12,"diff":1,"beginner":true},"gauche":{"min":26,"diff":1,"beginner":false},"matasaburo":{"min":67,"diff":1,"beginner":false},"yodaka":{"min":11,"diff":1,"beginner":true},"donguri":{"min":14,"diff":2,"beginner":false},"otsuberu":{"min":13,"diff":1,"beginner":true},"budori":{"min":56,"diff":1,"beginner":false},"maihime":{"min":34,"diff":5,"beginner":false},"takasebune":{"min":19,"diff":5,"beginner":false},"sansho":{"min":49,"diff":1,"beginner":false},"gan":{"min":163,"diff":2,"beginner":false},"lemon":{"min":11,"diff":2,"beginner":true},"sakura":{"min":4,"diff":1,"beginner":true},"sangetsu":{"min":13,"diff":2,"beginner":true},"meijin":{"min":12,"diff":5,"beginner":false},"deshi":{"min":53,"diff":2,"beginner":false},"riryo":{"min":75,"diff":3,"beginner":false},"takekurabe":{"min":64,"diff":5,"beginner":false},"nigorie":{"min":45,"diff":4,"beginner":false},"jusanya":{"min":28,"diff":5,"beginner":false},"daraku":{"min":17,"diff":3,"beginner":false},"hakuchi":{"min":51,"diff":3,"beginner":false},"koya":{"min":77,"diff":4,"beginner":false},"geka":{"min":16,"diff":2,"beginner":true},"gongitsune":{"min":11,"diff":1,"beginner":true},"tebukuro":{"min":8,"diff":1,"beginner":true},"akairousoku":{"min":14,"diff":1,"beginner":true},"tsukiyo":{"min":8,"diff":1,"beginner":true},"hae":{"min":8,"diff":2,"beginner":true},"harubasha":{"min":24,"diff":1,"beginner":false},"musashino":{"min":34,"diff":3,"beginner":false},"kanikosen":{"min":136,"diff":1,"beginner":false},"onshu":{"min":50,"diff":2,"beginner":false},"kazetachinu":{"min":121,"diff":2,"beginner":false},"hitofusa":{"min":14,"diff":1,"beginner":true},"chikyu":{"min":185,"diff":2,"beginner":false},"yoake":{"min":455,"diff":3,"beginner":false},"sumida":{"min":77,"diff":3,"beginner":false},"haguruma":{"min":56,"diff":3,"beginner":false},"ahou":{"min":27,"diff":3,"beginner":false},"hokyonin":{"min":21,"diff":3,"beginner":false},"gesaku":{"min":46,"diff":1,"beginner":false},"butokai":{"min":11,"diff":4,"beginner":false},"majutsu":{"min":16,"diff":2,"beginner":true},"sarukani":{"min":5,"diff":3,"beginner":false},"aki":{"min":25,"diff":3,"beginner":false},"rokunomiya":{"min":13,"diff":3,"beginner":false},"tsugaru":{"min":247,"diff":3,"beginner":false},"chikuken":{"min":27,"diff":1,"beginner":false},"goodbye":{"min":33,"diff":1,"beginner":false},"tokaton":{"min":28,"diff":2,"beginner":false},"romanesque":{"min":41,"diff":1,"beginner":false},"gyofuku":{"min":11,"diff":1,"beginner":true},"tokyo8":{"min":46,"diff":2,"beginner":false},"higan":{"min":433,"diff":3,"beginner":false},"kojin":{"min":493,"diff":2,"beginner":false},"garasudo":{"min":116,"diff":2,"beginner":false},"buncho":{"min":23,"diff":2,"beginner":false},"abe":{"min":61,"diff":3,"beginner":false},"saigo":{"min":20,"diff":5,"beginner":false},"kanzan":{"min":13,"diff":4,"beginner":false},"moso":{"min":30,"diff":3,"beginner":false},"nametoko":{"min":16,"diff":1,"beginner":true},"tsuchigami":{"min":21,"diff":1,"beginner":true},"hyoga":{"min":13,"diff":2,"beginner":false},"cairo":{"min":21,"diff":1,"beginner":true},"kainohi":{"min":32,"diff":1,"beginner":false},"otsugomori":{"min":22,"diff":5,"beginner":false},"wakaremichi":{"min":15,"diff":5,"beginner":false},"mojika":{"min":14,"diff":2,"beginner":true},"gojo":{"min":42,"diff":2,"beginner":false},"gojotan":{"min":28,"diff":2,"beginner":false},"fuyunohi":{"min":24,"diff":2,"beginner":false},"yaminoemaki":{"min":8,"diff":1,"beginner":true},"aibu":{"min":6,"diff":1,"beginner":true},"utaandon":{"min":79,"diff":2,"beginner":false},"kusameikyu":{"min":157,"diff":2,"beginner":false},"sakuranomori":{"min":37,"diff":1,"beginner":false},"kazehakase":{"min":12,"diff":2,"beginner":true},"bunkashikan":{"min":48,"diff":3,"beginner":false},"hananoki":{"min":21,"diff":1,"beginner":true},"nobara":{"min":5,"diff":1,"beginner":true},"cain":{"min":71,"diff":2,"beginner":false},"chisaki":{"min":22,"diff":2,"beginner":false},"wasureenu":{"min":21,"diff":2,"beginner":true},"gyuniku":{"min":35,"diff":3,"beginner":false},"harunotori":{"min":17,"diff":2,"beginner":true},"kikai":{"min":48,"diff":3,"beginner":false},"atama":{"min":6,"diff":3,"beginner":false},"utsukushii":{"min":95,"diff":2,"beginner":false},"seikazoku":{"min":35,"diff":2,"beginner":false},"oshie":{"min":130,"diff":3,"beginner":false},"shojo":{"min":232,"diff":3,"beginner":false},"meotozenzai":{"min":68,"diff":3,"beginner":false},"futon":{"min":99,"diff":3,"beginner":false},"ippeisotsu":{"min":25,"diff":2,"beginner":false},"ukigumo":{"min":251,"diff":3,"beginner":false},"gojunoto":{"min":125,"diff":3,"beginner":false},"konjiki":{"min":557,"diff":4,"beginner":false},"younenjidai":{"min":68,"diff":1,"beginner":false},"nekomachi":{"min":23,"diff":3,"beginner":false},"cement":{"min":6,"diff":1,"beginner":true},"byosho":{"min":194,"diff":4,"beginner":false},"ningyohime":{"min":35,"diff":2,"beginner":true},"akaikutsu":{"min":12,"diff":2,"beginner":true},"matchuri":{"min":6,"diff":1,"beginner":true},"rapunzel":{"min":12,"diff":2,"beginner":true},"shirayukihime":{"min":16,"diff":2,"beginner":true},"cinderella":{"min":15,"diff":2,"beginner":true},"yukino_joou":{"min":50,"diff":2,"beginner":true},"minikui":{"min":15,"diff":2,"beginner":true},"hadaka":{"min":8,"diff":1,"beginner":true},"suzuno":{"min":10,"diff":2,"beginner":true},"nonohakucho":{"min":18,"diff":2,"beginner":true},"soratobu":{"min":10,"diff":2,"beginner":true},"nightingale":{"min":16,"diff":2,"beginner":true},"momino":{"min":16,"diff":2,"beginner":true},"hansel":{"min":14,"diff":1,"beginner":true},"akazukin":{"min":7,"diff":1,"beginner":true},"bremen":{"min":9,"diff":1,"beginner":true},"ookami7":{"min":8,"diff":1,"beginner":true},"kaeru_ou":{"min":9,"diff":1,"beginner":true},"hoshino_ginka":{"min":3,"diff":1,"beginner":true},"nanawa_karasu":{"min":7,"diff":1,"beginner":true},"muttsu_hakucho":{"min":10,"diff":2,"beginner":true},"rumpel":{"min":8,"diff":1,"beginner":true},"nagagutsu":{"min":12,"diff":2,"beginner":true},"nemureru":{"min":14,"diff":2,"beginner":true},"aohige":{"min":11,"diff":2,"beginner":true}};
 const DIFF_LABEL = {1:"やさしい",2:"気軽",3:"標準",4:"手ごたえ",5:"難しい"};
 function diffMark(d){ let s=""; for(let i=1;i<=5;i++) s+=`<span class="${i<=d?'f':'e'}">●</span>`; return s; }        // 難易度は●
 function diffInline(d){ let s=""; for(let i=1;i<=5;i++) s+=`<span style="color:${i<=d?'#6f8fb0':'var(--line)'}">●</span>`; return s; }
@@ -733,6 +819,42 @@ let shelf = load("shiori.shelf", {});
 function load(k,def){ try{ return {...def, ...JSON.parse(localStorage.getItem(k)||"{}")}; }catch(e){ return {...def}; } }
 function save(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
 function saveShelf(){ save("shiori.shelf", shelf); }
+
+/* ---------- 読書活動ログ（日数・実読書時間・連続日数を蓄積・保存） ---------- */
+let readLog = load("shiori.readlog", {days:{}});   // days: { "YYYY-MM-DD": 秒 }
+function saveReadLog(){ save("shiori.readlog", readLog); }
+let _readLast = Date.now();
+function readActive(){ return !document.hidden && !document.getElementById("reader").classList.contains("hidden"); }
+function readTick(){
+  const now = Date.now();
+  if(readActive() && _readLast){
+    const dt = (now-_readLast)/1000;
+    if(dt>0 && dt<90){ const k=isoNow(); readLog.days[k]=(readLog.days[k]||0)+dt; saveReadLog(); }
+  }
+  _readLast = now;
+}
+function readStats(){
+  const map = readLog.days||{};
+  const set = new Set(Object.keys(map).filter(d=>map[d]>0));
+  const totalSec = Object.values(map).reduce((a,b)=>a+(b||0),0);
+  const key = dt => dt.toISOString().slice(0,10);
+  let streak=0, d=new Date(); if(!set.has(key(d))) d.setDate(d.getDate()-1);
+  while(set.has(key(d))){ streak++; d.setDate(d.getDate()-1); }
+  return { totalMin: Math.round(totalSec/60), days: set.size, streak };
+}
+function monthlyStats(n){
+  const map=readLog.days||{}, months={};
+  for(const d in map){ const mo=d.slice(0,7); months[mo]=(months[mo]||0)+(map[d]||0); }
+  const out=[], now=new Date();
+  for(let i=n-1;i>=0;i--){ const dt=new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const k=dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0");
+    out.push({ label:(dt.getMonth()+1)+"月", min:Math.round((months[k]||0)/60) });
+  }
+  return out;
+}
+setInterval(readTick, 20000);   // 読書画面が見えている間だけ加算
+document.addEventListener("visibilitychange", ()=>{ readTick(); _readLast=Date.now(); });
+window.addEventListener("pagehide", ()=>{ readTick(); });
 function rec(id){ return shelf[id] || (shelf[id] = {fraction:0}); }
 // 旧 shiori.bookmarks からの移行
 (function migrateBookmarks(){
@@ -763,9 +885,11 @@ let cur = { work:null, pages:1, page:0, pageWidth:0, colPitch:0, plainText:"" };
 /* =========================================================
    LIBRARY
    ========================================================= */
-let libSort = "author", libBeginnerOnly = false, libCheckedOnly = false, libStatus = "all";
+let libSort = "author", libBeginnerOnly = false, libCheckedOnly = false, libStatus = "all", libGenre = "all";
 function setSort(v){ libSort = v; renderLibrary(); }
 function setStatusFilter(v){ libStatus = v; renderLibrary(); }
+function setGenre(v){ libGenre = v; renderLibrary(); }
+const catOf = w => w.category || "文学";   // categoryなし＝日本文学
 function toggleBeginner(){
   libBeginnerOnly = !libBeginnerOnly;
   document.getElementById("begBtn").classList.toggle("on", libBeginnerOnly);
@@ -792,7 +916,7 @@ function recoCard(w, md, reason, cont){
     <div class="rc-title">${w.title}</div>
     <div class="rc-author">${w.author}</div>
     <div class="rc-reason">${cont?"▶ ":""}${escapeHtml(reason)}</div>
-    <div class="rc-meta">難 ${diffInline(md.diff)} ・ ⏱ ${fmtTime(md.min)}</div>
+    <div class="rc-meta">難 ${diffInline(md.diff)} ・ <svg class=ic><use href=#ic-clock /></svg> ${fmtTime(md.min)}</div>
   </div>`;
 }
 function renderRecommendations(show){
@@ -820,7 +944,7 @@ function renderRecommendations(show){
     return {w, md, sc, reason};
   }).sort((a,b)=> b.sc-a.sc);
 
-  let html=`<h2>🧭 ${hasHistory?"あなたへの次の一冊":"はじめの一冊に"}</h2><div class="reco-row">`;
+  let html=`<h2><svg class=ic><use href=#ic-compass /></svg> ${hasHistory?"あなたへの次の一冊":"はじめの一冊に"}</h2><div class="reco-row">`;
   readingWorks.slice(0,2).forEach(w=>{
     const pct=Math.round((shelf[w.id].fraction||0)*100);
     html+=recoCard(w, m(w.id), `続きから（${pct}%）`, true);
@@ -837,6 +961,7 @@ function renderLibrary(){
   grid.innerHTML = "";
   const m = id => META[id] || {min:0,diff:0,beginner:false};
   let list = WORKS.filter(w => !q || (w.title+w.author).toLowerCase().includes(q));
+  if(libGenre!=="all") list = list.filter(w => catOf(w)===libGenre);
   if(libBeginnerOnly) list = list.filter(w => m(w.id).beginner);
   if(libCheckedOnly)  list = list.filter(w => shelf[w.id] && shelf[w.id].checked);
   if(libStatus!=="all") list = list.filter(w => statusOf(w.id)===libStatus);
@@ -850,9 +975,10 @@ function renderLibrary(){
   else if(libSort==="rating")list = [...list].sort((a,b)=> ((shelf[b.id]&&shelf[b.id].rating)||0)-((shelf[a.id]&&shelf[a.id].rating)||0));
   else if(libSort==="recent")list = [...list].sort((a,b)=> lastActivity(b.id).localeCompare(lastActivity(a.id)));
 
-  renderRecommendations(!q && libStatus==="all" && !libBeginnerOnly && !libCheckedOnly);
+  renderRecommendations(!q && libStatus==="all" && libGenre==="all" && !libBeginnerOnly && !libCheckedOnly);
 
   const parts = [];
+  if(libGenre!=="all") parts.push(libGenre==="童話"?"童話・世界の名作":"日本文学");
   if(libBeginnerOnly) parts.push("はじめての一冊");
   if(libCheckedOnly)  parts.push("気になる");
   if(libStatus!=="all") parts.push(STATUS_LABEL[libStatus]);
@@ -879,12 +1005,12 @@ function renderLibrary(){
     c.className = "card";
     c.innerHTML =
       `<span class="spine"></span>` +
-      `<button class="checkbtn ${r.checked?'on':''}" title="気になる（あとで読む）に登録" onclick="toggleCheck(event,'${w.id}')">🔖<span>${r.checked?'気になる済':'気になる'}</span></button>` +
+      `<button class="checkbtn ${r.checked?'on':''}" title="気になる（あとで読む）に登録" onclick="toggleCheck(event,'${w.id}')"><svg class=ic><use href=#ic-bookmark /></svg><span>${r.checked?'気になる済':'気になる'}</span></button>` +
       `<div class="vtitle">${w.title}</div>` +
       `<div class="author">${w.author}</div>` +
       `<div class="meta">` +
         `<span class="diffm" title="難易度：${DIFF_LABEL[md.diff]||"—"}">難 ${diffMark(md.diff)}</span>` +
-        `<span class="rt">⏱ ${fmtTime(md.min)}</span>` +
+        `<span class="rt"><svg class=ic><use href=#ic-clock /></svg> ${fmtTime(md.min)}</span>` +
         (md.beginner ? `<span class="btag">はじめて</span>` : ``) +
       `</div>` +
       `<div class="statusline">` +
@@ -907,7 +1033,7 @@ function openReview(id){
   scrim.className = "scrim center"; scrim.onclick=(e)=>{ if(e.target===scrim) scrim.remove(); };
   scrim.innerHTML = `
     <div class="modal" onclick="event.stopPropagation()">
-      <div class="dhead"><h3>📝 レビュー</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
+      <div class="dhead"><h3><svg class=ic><use href=#ic-pen /></svg> レビュー</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
       <div class="dbody">
         <div class="note" style="margin-bottom:14px">${w.title} / ${w.author}</div>
         <div class="field"><label>評価（星）</label><div class="rate" id="rateRow"></div></div>
@@ -948,6 +1074,7 @@ function deleteReview(id, btn){
   saveShelf(); btn.closest(".scrim").remove(); renderLibrary();
 }
 function showLibrary(){
+  readTick();   // 読書画面を離れる前に、この間の読書時間を記録
   document.getElementById("reader").classList.add("hidden");
   document.getElementById("library").classList.remove("hidden");
   document.getElementById("btn-ask").hidden = true;
@@ -967,6 +1094,7 @@ function showLibrary(){
    ========================================================= */
 async function openWork(w){
   cur.work = w;
+  _readLast = Date.now();   // 読書時間の計測起点
   document.getElementById("library").classList.add("hidden");
   document.getElementById("reader").classList.remove("hidden");
   document.getElementById("btn-ask").hidden = false;
@@ -1057,7 +1185,7 @@ function applyPage(animate=true){
   const frac = cur.pages>1 ? cur.page/(cur.pages-1) : 0;
   document.getElementById("progBar").style.width = (frac*100)+"%";
   const knob=document.getElementById("progKnob"); if(knob) knob.style.left = ((1-frac)*100)+"%";   // 右=最初, 左へ進む（縦書き右→左に合わせる）
-  document.getElementById("pageNo").textContent = `🔖 ${cur.page+1}/${cur.pages}・${Math.round(frac*100)}%`;
+  document.getElementById("pageNo").textContent = `${cur.page+1}/${cur.pages}・${Math.round(frac*100)}%`;
   if(cur.work){
     const r = rec(cur.work.id);
     r.fraction = frac; r.updated = isoNow();
@@ -1076,7 +1204,7 @@ function maybePromptReview(){
   if(rc){
     const recs = recommendFor(cur.work?cur.work.id:null, 3);
     rc.innerHTML = recs.length
-      ? `<div class="ft-recos-label">📚 こちらもおすすめ</div><div class="reco-row">`+recs.map(p=>recoCard(p.w,p.md,p.reason,false)).join("")+`</div>`
+      ? `<div class="ft-recos-label"><svg class=ic><use href=#ic-books /></svg> こちらもおすすめ</div><div class="reco-row">`+recs.map(p=>recoCard(p.w,p.md,p.reason,false)).join("")+`</div>`
       : "";
     rc.querySelectorAll("[data-wid]").forEach(el=> el.onclick=()=>{ const w=WORKS.find(x=>x.id===el.dataset.wid); if(w) openWork(w); });
   }
@@ -1476,7 +1604,7 @@ function hasKey(){ return !!geminiKey(); }
 const GEMINI_MODELS=["gemini-2.5-flash-lite","gemini-2.0-flash","gemini-2.5-flash"];
 async function openaiChat(messages, opts={}){
   const key=geminiKey();
-  if(!key) throw new Error("Gemini APIキーが未設定です。⚙️設定で無料キーを入れてください。");
+  if(!key) throw new Error("Gemini APIキーが未設定です。<svg class=ic><use href=#ic-settings /></svg>設定で無料キーを入れてください。");
   const sys = messages.filter(m=>m.role==="system").map(m=>m.content).join("\n\n");
   const userText = messages.filter(m=>m.role!=="system").map(m=>m.content).join("\n\n");
   const preferred = settings.chatModel || GEMINI_MODELS[0];
@@ -1521,7 +1649,7 @@ function openAI(tab){
   scrim.className="scrim"; scrim.onclick=(e)=>{ if(e.target===scrim) scrim.remove(); };
   scrim.innerHTML = `
     <div class="drawer" onclick="event.stopPropagation()">
-      <div class="dhead"><h3>📖 読む道具</h3>
+      <div class="dhead"><h3><svg class=ic><use href=#ic-book /></svg> 読む道具</h3>
         <button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
       <div class="ai-tabs">
         <button data-t="dict">辞書</button>
@@ -1546,9 +1674,9 @@ function renderAITab(){
       `<div class="field"><label>調べたい言葉</label>
         <input type="text" id="dictInput" value="${escapeAttr(sel)}" placeholder="言葉を入力、または本文をなぞって選択"
           onkeydown="if(event.key==='Enter')runDict()"></div>
-       <button class="btn-primary" onclick="runDict()">📖 辞書で調べる</button>
-       ${hasKey()? `<button class="btn-ghost" style="margin-top:8px" onclick="runExplain()">✨ AIで文脈に沿って解説</button>`:``}
-       <div class="note">Wiktionary・Wikipedia から意味を引きます（APIキー不要）。本文の語句をドラッグ選択 →「📖 意味を調べる」でもここに入ります。</div>
+       <button class="btn-primary" onclick="runDict()"><svg class=ic><use href=#ic-book /></svg> 辞書で調べる</button>
+       ${hasKey()? `<button class="btn-ghost" style="margin-top:8px" onclick="runExplain()"><svg class=ic><use href=#ic-sparkle /></svg> AIで文脈に沿って解説</button>`:``}
+       <div class="note">Wiktionary・Wikipedia から意味を引きます（APIキー不要）。本文の語句をドラッグ選択 →「<svg class=ic><use href=#ic-book /></svg> 意味を調べる」でもここに入ります。</div>
        <div class="ai-out placeholder" id="dictOut" style="margin-top:16px">難読語・古語・固有名詞などの意味を、その場ですぐ調べられます。</div>`;
     if(sel) runDict();
   } else if(aiTab==="summary"){
@@ -1559,7 +1687,7 @@ function renderAITab(){
       `<div class="note">${wk} ・ あらすじ／解説</div>
        ${info}
        <div class="ai-out" id="summaryOut" style="margin-top:12px">${escapeHtml(s)}</div>
-       ${hasKey()? `<button class="btn-ghost" style="margin-top:16px" onclick="runAISummary()">✨ AIで本文から要約し直す</button>`:``}`;
+       ${hasKey()? `<button class="btn-ghost" style="margin-top:16px" onclick="runAISummary()"><svg class=ic><use href=#ic-sparkle /></svg> AIで本文から要約し直す</button>`:``}`;
   } else if(aiTab==="era"){
     body.innerHTML =
       `<div class="note">${wk}</div>
@@ -1625,7 +1753,7 @@ async function runExplain(){   // AIによる文脈解説（キー必須）→ d
       {role:"system",content:"あなたは日本近代文学に精通した読書ガイドです。読者が読書中に出会った語句を、この文脈での意味に絞って簡潔にやさしく解説します。150字以内。"},
       {role:"user",content:`作品『${cur.work?.title}』（${cur.work?.author}）を読んでいます。語句「${term}」をこの文脈に沿って解説してください。\n\n文脈抜粋：${cur.plainText.slice(0,600)}`}
     ]);
-    setOut("dictOut", "✨ AI解説\n\n"+escapeHtml(out));
+    setOut("dictOut", "<svg class=ic><use href=#ic-sparkle /></svg> AI解説\n\n"+escapeHtml(out));
   }catch(e){ setOut("dictOut","エラー: "+e.message,"placeholder"); }
 }
 async function runAISummary(){
@@ -1820,7 +1948,7 @@ function openNotes(focusHid){
   scrim.onclick=(e)=>{ if(e.target===scrim) scrim.remove(); };
   scrim.innerHTML=`
     <div class="drawer" onclick="event.stopPropagation()">
-      <div class="dhead"><h3>🖍 ハイライト・メモ</h3>
+      <div class="dhead"><h3><svg class=ic><use href=#ic-highlight /></svg> ハイライト・メモ</h3>
         <button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
       <div class="dbody" id="notesBody"></div>
     </div>`;
@@ -1831,7 +1959,7 @@ function renderNotesBody(focusHid){
   const body=document.getElementById("notesBody"); if(!body) return;
   const arr=hlList();
   let html=`<button class="btn-ghost" style="margin-bottom:14px" onclick="addStandaloneMemo()">＋ メモを追加</button>`;
-  if(!arr.length) html+=`<div class="note">本文をなぞって「🖍 ハイライト」や「📝 メモ」を押すと、ここに一覧されます。読み返しやテスト対策に。</div>`;
+  if(!arr.length) html+=`<div class="note">本文をなぞって「<svg class=ic><use href=#ic-highlight /></svg> ハイライト」や「<svg class=ic><use href=#ic-pen /></svg> メモ」を押すと、ここに一覧されます。読み返しやテスト対策に。</div>`;
   arr.slice().reverse().forEach(h=>{
     const sw=HL_COLORS.map(([k,c])=>`<span class="swatch ${h.color===k?'on':''}" style="background:${c}" title="${k}" onclick="setHlColor('${h.hid}','${k}'); renderNotesBody()"></span>`).join("");
     html+=`<div class="note-item" id="ni-${h.hid}">
@@ -1873,24 +2001,24 @@ function openAsk(selText){
   const chips = askSelText ? `
       <div class="ask-quotes">${escapeHtml(trimLen(askSelText,160))}</div>
       <div class="ask-chips">
-        <button onclick="askQuick('現代語訳')">💬 現代語訳</button>
-        <button onclick="askQuick('語句の意味')">📖 語句の意味</button>
-        <button onclick="askQuick('表現の意図')">🧠 表現の意図</button>
-        <button onclick="askQuick('見どころ')">✨ 見どころ</button>
+        <button onclick="askQuick('現代語訳')"><svg class=ic><use href=#ic-chat /></svg> 現代語訳</button>
+        <button onclick="askQuick('語句の意味')"><svg class=ic><use href=#ic-book /></svg> 語句の意味</button>
+        <button onclick="askQuick('表現の意図')"><svg class=ic><use href=#ic-bulb /></svg> 表現の意図</button>
+        <button onclick="askQuick('見どころ')"><svg class=ic><use href=#ic-sparkle /></svg> 見どころ</button>
       </div>` : `
       <div class="ask-chips">
-        <button onclick="askQuick('テーマ')">🧠 テーマ</button>
-        <button onclick="askQuick('あらすじ')">📖 あらすじ</button>
-        <button onclick="askQuick('テスト')">📝 テストに出そうな点</button>
-        <button onclick="askQuick('作者')">✨ 作者の意図</button>
+        <button onclick="askQuick('テーマ')"><svg class=ic><use href=#ic-bulb /></svg> テーマ</button>
+        <button onclick="askQuick('あらすじ')"><svg class=ic><use href=#ic-book /></svg> あらすじ</button>
+        <button onclick="askQuick('テスト')"><svg class=ic><use href=#ic-pen /></svg> テストに出そうな点</button>
+        <button onclick="askQuick('作者')"><svg class=ic><use href=#ic-sparkle /></svg> 作者の意図</button>
       </div>`;
-  const notice = hasKey()? "" : `<div class="key-notice">💡 AIとの対話には <b>Gemini APIキー（無料・クレカ不要）</b> が必要です。<br>
-        <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">🔑 無料キーを取得（aistudio.google.com/apikey）</a> → Googleでログイン →「Create API key」でコピー。<br>
+  const notice = hasKey()? "" : `<div class="key-notice"><svg class=ic><use href=#ic-bulb /></svg> AIとの対話には <b>Gemini APIキー（無料・クレカ不要）</b> が必要です。<br>
+        <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600"><svg class=ic><use href=#ic-key /></svg> 無料キーを取得（aistudio.google.com/apikey）</a> → Googleでログイン →「Create API key」でコピー。<br>
         <span style="color:var(--sub);font-size:12px">※ キーはこの端末のブラウザ内にだけ保存され、外部には送られません（GoogleへのAPI通信を除く）。無料枠の範囲で使えます。共有PCではご注意を。</span>
-        <button class="btn-ghost" style="margin-top:9px" onclick="this.closest('.scrim').remove(); openSettings()">⚙️ 設定でキーを入れる</button></div>`;
+        <button class="btn-ghost" style="margin-top:9px" onclick="this.closest('.scrim').remove(); openSettings()"><svg class=ic><use href=#ic-settings /></svg> 設定でキーを入れる</button></div>`;
   scrim.innerHTML=`
     <div class="drawer" onclick="event.stopPropagation()">
-      <div class="dhead"><h3>💬 AIに聞く</h3>
+      <div class="dhead"><h3><svg class=ic><use href=#ic-chat /></svg> AIに聞く</h3>
         <button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
       <div class="dbody" style="display:flex; flex-direction:column">
         <div class="note">『${cur.work.title}』（${cur.work.author}）について、${askSelText?"選択箇所や":""}作品全体を質問できます。</div>
@@ -1924,7 +2052,7 @@ function askContext(){
 }
 async function askRun(question, label){
   if(!hasKey()){
-    askLog.push({q: label?label:question, a:"AIに質問するには、⚙️設定で Gemini の API キー（無料・クレカ不要）を入れてください。\n（語句の意味だけなら、本文を選択して「📖 辞書」で無料で調べられます。）"});
+    askLog.push({q: label?label:question, a:"AIに質問するには、<svg class=ic><use href=#ic-settings /></svg>設定で Gemini の API キー（無料・クレカ不要）を入れてください。\n（語句の意味だけなら、本文を選択して「<svg class=ic><use href=#ic-book /></svg> 辞書」で無料で調べられます。）"});
     renderAskLog(); return;
   }
   const entry={q: label?label:question, a:"", pending:true}; askLog.push(entry); renderAskLog();
@@ -1973,7 +2101,7 @@ function openSettings(){
   scrim.className="scrim center"; scrim.onclick=(e)=>{ if(e.target===scrim) scrim.remove(); };
   scrim.innerHTML = `
     <div class="modal" onclick="event.stopPropagation()">
-      <div class="dhead"><h3>⚙️ 設定</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
+      <div class="dhead"><h3><svg class=ic><use href=#ic-settings /></svg> 設定</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
       <div class="dbody">
         <div class="field"><label>テーマ</label>
           <div class="seg" id="segTheme">
@@ -1983,7 +2111,7 @@ function openSettings(){
           <input type="range" min="8" max="30" step="1" value="${settings.size}" style="width:100%" id="sizeRange">
           <div class="note">スマホでは 10〜14px あたりが目安です。</div>
         </div>
-        <div class="note" style="margin:-6px 0 18px">💡 ふりがな（総ルビ）は、読書画面の「ふりがな」ボタンで必要なときだけ付けられます。</div>
+        <div class="note" style="margin:-6px 0 18px"><svg class=ic><use href=#ic-bulb /></svg> ふりがな（総ルビ）は、読書画面の「ふりがな」ボタンで必要なときだけ付けられます。</div>
         <hr style="border:none;border-top:1px solid var(--line);margin:22px 0">
         <div class="field"><label>Gemini API キー（無料・任意）</label>
           <input type="password" id="keyInput" value="${escapeAttr(settings.geminiKey)}" placeholder="AIza... 未入力ならデモ動作">
@@ -1997,19 +2125,32 @@ function openSettings(){
           </select>
         </div>
         <hr style="border:none;border-top:1px solid var(--line);margin:22px 0">
+        <div class="field"><label>端末間の同期（スマホ ⇄ PC）</label>
+          <div class="note" style="margin:0 0 10px">同期コードを発行し、他の端末で同じコードを入力すると、しおり・ハイライト・レビュー・読書統計・テーマが自動で同期されます。<b>APIキーと文字サイズは端末ごと</b>（同期されません）。コードは合鍵です。他人に教えないでください。</div>
+          <div id="syncCodeRow" style="display:none;margin:0 0 10px"><code id="syncCodeText" style="user-select:all;font-size:13px">​</code> <button class="btn-ghost" onclick="syncCopyCode()">コピー</button></div>
+          <div class="seg">
+            <button id="syncIssueBtn" onclick="syncIssue()">コードを発行</button>
+            <button id="syncEnterBtn" onclick="syncEnter()">コードを入力</button>
+            <button id="syncNowBtn" style="display:none" onclick="syncNow()">今すぐ同期</button>
+            <button id="syncOffBtn" style="display:none" onclick="syncOff()">解除</button>
+          </div>
+          <div class="note" id="syncStatus" style="margin-top:8px"></div>
+        </div>
+        <hr style="border:none;border-top:1px solid var(--line);margin:22px 0">
         <div class="field"><label>データのバックアップ</label>
           <div class="seg">
-            <button onclick="exportData()">⬇ 書き出し</button>
-            <button onclick="document.getElementById('importFile').click()">⬆ 読み込み</button>
+            <button onclick="exportData()"><svg class=ic><use href=#ic-download /></svg> 書き出し</button>
+            <button onclick="document.getElementById('importFile').click()"><svg class=ic><use href=#ic-upload /></svg> 読み込み</button>
           </div>
           <input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(this)">
-          <div class="note">しおり・ハイライト・メモ・レビュー・気になるを1つのファイルに保存／復元します（端末やURLの引っ越しにも）。APIキーは含まれません。</div>
+          <div class="note">しおり・ハイライト・メモ・レビュー・気になる・<b>読書統計（日数/時間/連続日数）</b>・テーマ設定を、1つのファイルに保存／復元します（端末やURLの引っ越し・機種変更にも）。定期的な書き出しをおすすめします。※APIキーは安全のため含まれません。</div>
         </div>
         <button class="btn-primary" onclick="commitSettings(this)">保存する</button>
       </div>
     </div>`;
   document.body.appendChild(scrim);
   segInit("segTheme", settings.theme);
+  renderSyncUI();
   document.getElementById("modelSelect").value = settings.chatModel;
   const sr=document.getElementById("sizeRange");
   sr.oninput=()=>{ document.getElementById("sizeVal").textContent=sr.value;
@@ -2042,8 +2183,10 @@ function commitSettings(btn){
 
 /* ---------- データのバックアップ ---------- */
 function exportData(){
-  const data = { app:"shiori", version:1, date:new Date().toISOString(),
-    settings:{ theme:settings.theme, size:settings.size }, shelf: shelf };
+  readTick();   // 直近の読書時間も書き出しに含める
+  const data = { app:"shiori", version:2, date:new Date().toISOString(),
+    settings:{ theme:settings.theme, size:settings.size, chatModel:settings.chatModel },
+    shelf: shelf, readlog: readLog };
   const blob = new Blob([JSON.stringify(data,null,1)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -2074,13 +2217,200 @@ function importData(input){
         }
       }
       saveShelf();
-      if(data.settings && data.settings.theme){ /* テーマは任意適用しない（現状維持） */ }
+      // 設定（テーマ・文字サイズ・AIモデル）を復元
+      if(data.settings){
+        if(data.settings.theme) settings.theme = data.settings.theme;
+        if(typeof data.settings.size==="number") settings.size = data.settings.size;
+        if(data.settings.chatModel) settings.chatModel = data.settings.chatModel;
+        saveSettings();   // applyTheme込み
+        document.documentElement.style.setProperty("--reader-size", settings.size+"px");
+      }
+      // 読書活動ログ（日数・時間・連続日数）をマージ。日ごとに大きい方＝再読込での二重計上を防ぐ
+      if(data.readlog && data.readlog.days){
+        readLog.days = readLog.days || {};
+        for(const d in data.readlog.days){ readLog.days[d] = Math.max(readLog.days[d]||0, data.readlog.days[d]||0); }
+        saveReadLog();
+      }
       alert(n+" 作品ぶんの記録を読み込みました。");
       renderLibrary();
     }catch(e){ alert("読み込みに失敗しました：" + e.message); }
     input.value = "";
   };
   reader.readAsText(file);
+}
+
+/* ---------- 端末間同期（shimi-sync: 同期コード方式） ----------
+   保存のたびに shelf/readlog/settings(一部) を Cloudflare KV へ送信（最短60秒間隔）。
+   起動時とタブ復帰時に取得し、作品ごと・日付ごとに統合マージ（importDataと同じ方針）。
+   サーバーは楽観ロック(409)で「古い端末による黙った上書き」を拒否する。
+   APIキー(geminiKey)と文字サイズ(size)は端末ごとの設定として同期しない。 */
+const SYNC_URL="https://shimi-sync.shimi-works.workers.dev/v1/shiori/";
+const SYNC_LS_CODE="shiori.sync.code", SYNC_LS_BASE="shiori.sync.base", SYNC_LS_DIRTY="shiori.sync.dirty";
+const SYNC_KEYS=["shiori.shelf","shiori.readlog","shiori.settings"];
+const SYNC_MIN_GAP=60000;   // 読書中は20秒ごとに保存が走るため、送信は間引く（KV無料枠の保護）
+function syncCode(){ return localStorage.getItem(SYNC_LS_CODE)||""; }
+function syncBase(){ const v=localStorage.getItem(SYNC_LS_BASE); return v==null?null:+v; }
+function setSyncBase(t){ localStorage.setItem(SYNC_LS_BASE,String(t)); }
+function syncDirtyAt(){ return +(localStorage.getItem(SYNC_LS_DIRTY)||0); }
+function syncTouch(k){
+  if(!SYNC_KEYS.includes(k)||!syncCode()) return;
+  localStorage.setItem(SYNC_LS_DIRTY,String(Date.now()));
+  schedulePush();
+}
+const saveCore=save;
+save=function(k,v){ saveCore(k,v); syncTouch(k); };
+
+function syncParse(s,def){ try{ return JSON.parse(s)??def; }catch(e){ return def; } }
+function syncCollect(){
+  const d={};
+  d["shiori.shelf"]=localStorage.getItem("shiori.shelf")||"{}";
+  d["shiori.readlog"]=localStorage.getItem("shiori.readlog")||'{"days":{}}';
+  d["shiori.settings"]=JSON.stringify({theme:settings.theme, chatModel:settings.chatModel});  // キーとサイズは含めない
+  return d;
+}
+function mergeShelf(A,B){   // 作品ごとに統合。進捗=大きい方、気になる=OR、ハイライト=hid単位の和集合
+  const out={};
+  for(const id of new Set([...Object.keys(A),...Object.keys(B)])){
+    const a=A[id], b=B[id];
+    if(!a||!b){ out[id]={...(a||b)}; continue; }
+    const newerB=String(b.updated||"")>=String(a.updated||"");
+    const e={...(newerB?a:b), ...(newerB?b:a)};   // 新しい側の値を優先しつつ、欠けは古い側で補う
+    e.fraction=Math.max(a.fraction||0, b.fraction||0);
+    if(a.checked||b.checked) e.checked=true;
+    if(Array.isArray(a.highlights)||Array.isArray(b.highlights)){
+      const hs=[...(a.highlights||[])], seen=new Set(hs.map(h=>h&&h.hid));
+      (b.highlights||[]).forEach(h=>{ if(h&&h.hid&&!seen.has(h.hid)){ hs.push(h); seen.add(h.hid); } });
+      e.highlights=hs;
+    }
+    out[id]=e;
+  }
+  return out;
+}
+function mergeSyncData(L,R,localNewer){
+  const P=localNewer?L:R, S=localNewer?R:L;   // P=新しい側を優先
+  const out={};
+  out["shiori.shelf"]=JSON.stringify(mergeShelf(syncParse(L["shiori.shelf"],{}),syncParse(R["shiori.shelf"],{})));
+  const la=syncParse(L["shiori.readlog"],{days:{}}).days||{}, rb=syncParse(R["shiori.readlog"],{days:{}}).days||{};
+  const days={};   // 日ごとに大きい方＝二重計上を防ぐ（importDataと同じ）
+  for(const d of new Set([...Object.keys(la),...Object.keys(rb)])) days[d]=Math.max(la[d]||0, rb[d]||0);
+  out["shiori.readlog"]=JSON.stringify({days});
+  out["shiori.settings"]=P["shiori.settings"]!=null?P["shiori.settings"]:S["shiori.settings"];
+  return out;
+}
+function syncApply(d){
+  if(d["shiori.shelf"]!=null) localStorage.setItem("shiori.shelf",d["shiori.shelf"]);
+  if(d["shiori.readlog"]!=null) localStorage.setItem("shiori.readlog",d["shiori.readlog"]);
+  if(d["shiori.settings"]!=null){
+    const s=syncParse(d["shiori.settings"],{});
+    if(s.theme) settings.theme=s.theme;
+    if(s.chatModel) settings.chatModel=s.chatModel;
+    saveCore("shiori.settings",settings);   // geminiKey・sizeはこの端末の値を維持
+  }
+  shelf=load("shiori.shelf",{});
+  readLog=load("shiori.readlog",{days:{}});
+  applyTheme(); renderLibrary();
+}
+let syncTimer=null, syncBusy=false, syncQueued=false, syncLastPush=0;
+function schedulePush(){
+  clearTimeout(syncTimer);
+  const wait=Math.max(2500, SYNC_MIN_GAP-(Date.now()-syncLastPush));
+  syncTimer=setTimeout(doPush, wait);
+}
+function syncStatusMsg(t){ const el=document.getElementById("syncStatus"); if(el) el.textContent=t; }
+function syncTime(){ const d=new Date(),p=n=>String(n).padStart(2,"0"); return p(d.getHours())+":"+p(d.getMinutes()); }
+async function adoptRemote(remote){
+  const dirtyAt=syncDirtyAt();
+  if(!dirtyAt){   // 未送信のローカル変更なし→リモートをそのまま採用（他端末での削除もここで反映される）
+    syncApply(remote.data||{}); setSyncBase(remote.updatedAt);
+    syncStatusMsg("同期済み（"+syncTime()+"）"); return;
+  }
+  // 両方に変更がある（衝突）→ 作品・日付ごとに統合マージして再送。この場合のみ削除が復活しうる
+  const merged=mergeSyncData(syncCollect(),remote.data||{},dirtyAt>remote.updatedAt);
+  syncApply(merged); setSyncBase(remote.updatedAt);
+  await doPush();
+}
+async function doPush(){
+  const code=syncCode(); if(!code) return;
+  if(syncBusy){ syncQueued=true; return; }
+  syncBusy=true; clearTimeout(syncTimer);
+  try{
+    readTick();   // 直近の読書時間も含めて送る
+    const body={baseUpdatedAt:syncBase(), updatedAt:Date.now(), data:syncCollect()};
+    const res=await fetch(SYNC_URL+code,{method:"PUT",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
+    if(res.status===409){ const remote=await res.json(); syncBusy=false; await adoptRemote(remote); return; }
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    syncLastPush=Date.now();
+    setSyncBase(body.updatedAt); localStorage.removeItem(SYNC_LS_DIRTY);
+    syncStatusMsg("同期済み（"+syncTime()+"）");
+  }catch(e){
+    syncStatusMsg("同期できませんでした（オフライン？）。次の保存時に自動で再送します。");
+  }finally{
+    syncBusy=false;
+    if(syncQueued){ syncQueued=false; schedulePush(); }
+  }
+}
+async function doPull(){
+  const code=syncCode(); if(!code) return;
+  try{
+    const res=await fetch(SYNC_URL+code);
+    if(res.status===404){ await doPush(); return; }   // クラウド側が空→この端末の記録を初回アップロード
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const remote=await res.json();
+    if(remote.updatedAt!==syncBase()) await adoptRemote(remote);
+    else if(syncDirtyAt()) await doPush();
+    else syncStatusMsg("同期済み（"+syncTime()+"）");
+  }catch(e){
+    syncStatusMsg("同期できませんでした（オフライン？）。接続後に自動で再試行します。");
+  }
+}
+/* --- 同期UI --- */
+function syncNewCode(){
+  const cs="ABCDEFGHJKMNPQRSTUVWXYZ23456789";   // 紛らわしい I/L/O/0/1 は使わない
+  const buf=new Uint32Array(20); crypto.getRandomValues(buf);
+  const s=[...buf].map(n=>cs[n%cs.length]);
+  return [0,1,2,3,4].map(i=>s.slice(i*4,i*4+4).join("")).join("-");
+}
+function renderSyncUI(){
+  const on=!!syncCode(), $=id=>document.getElementById(id);
+  if(!$("syncCodeRow")) return;
+  $("syncCodeRow").style.display=on?"":"none";
+  $("syncCodeText").textContent=syncCode();
+  $("syncIssueBtn").style.display=on?"none":"";
+  $("syncEnterBtn").style.display=on?"none":"";
+  $("syncNowBtn").style.display=on?"":"none";
+  $("syncOffBtn").style.display=on?"":"none";
+}
+function syncIssue(){
+  localStorage.setItem(SYNC_LS_CODE,syncNewCode());
+  localStorage.removeItem(SYNC_LS_BASE);
+  renderSyncUI(); syncStatusMsg("コードを発行しました。他の端末で「コードを入力」してください。");
+  doPush();
+}
+function syncEnter(){
+  const raw=prompt("他の端末で発行した同期コードを入力してください（例: ABCD-EFGH-JKMN-PQRS-TUVW）");
+  if(raw==null) return;
+  const code=raw.trim().toUpperCase();
+  if(!/^[A-HJ-NP-Z2-9]{4}(-[A-HJ-NP-Z2-9]{4}){4}$/.test(code)){ alert("コードの形式が正しくありません。"); return; }
+  localStorage.setItem(SYNC_LS_CODE,code);
+  localStorage.removeItem(SYNC_LS_BASE);
+  localStorage.setItem(SYNC_LS_DIRTY,String(Date.now()));   // この端末の記録もマージで残す
+  renderSyncUI(); syncStatusMsg("同期しています…");
+  doPull();
+}
+function syncNow(){ syncStatusMsg("同期しています…"); doPull(); }
+function syncOff(){
+  if(!confirm("この端末の同期を解除しますか？（データは消えません。クラウド上のデータも残ります）")) return;
+  localStorage.removeItem(SYNC_LS_CODE); localStorage.removeItem(SYNC_LS_BASE); localStorage.removeItem(SYNC_LS_DIRTY);
+  renderSyncUI();
+}
+function syncCopyCode(){
+  navigator.clipboard?.writeText(syncCode()).then(()=>syncStatusMsg("コードをコピーしました。"),()=>{});
+}
+function syncInit(){
+  if(syncCode()) doPull();
+  document.addEventListener("visibilitychange",()=>{   // タブ復帰時に取得（端末の切替を想定）
+    if(document.visibilityState==="visible"&&syncCode()&&!syncBusy) doPull();
+  });
 }
 
 /* ---------- 読書統計 ---------- */
@@ -2091,51 +2421,51 @@ function openHelp(){
   scrim.onclick=function(e){ if(e.target===scrim) scrim.remove(); };
   scrim.innerHTML=
     '<div class="modal" onclick="event.stopPropagation()">'+
-      '<div class="dhead"><h3>❓ 使い方</h3><button class="icon-btn close" onclick="this.closest(\'.scrim\').remove()">閉じる</button></div>'+
+      '<div class="dhead"><h3><svg class=ic><use href=#ic-help /></svg> 使い方</h3><button class="icon-btn close" onclick="this.closest(\'.scrim\').remove()">閉じる</button></div>'+
       '<div class="dbody help">'+
         '<p>青空文庫の名作を<b>“理解しながら読む”</b>ためのアプリです。<b>すべて無料</b>で使えます（AIとの対話には無料のGeminiキーが必要・クレカ不要）。</p>'+
 
-        '<h4>📖 読む</h4>'+
+        '<h4><svg class=ic><use href=#ic-book /></svg> 読む</h4>'+
         '<ul>'+
           '<li>棚で<b>作品をタップ</b>すると開きます。</li>'+
           '<li>ページをめくる：画面の<b>左右のボタン（‹ ›）</b>をタップ。矢印キーやマウスホイールでも（ホイールは一気に読み飛ばせます）。</li>'+
           '<li>一気に移動：下の<b>進捗バーをドラッグ</b>すると好きな位置へ飛べます。</li>'+
           '<li>読んだ位置は<b>自動でしおり保存</b>。次に開くと続きから。下のバーに現在位置(%)。</li>'+
-          '<li>文字サイズ・テーマ（和紙/白/夜）は<kbd>⚙️ 設定</kbd>で変更。</li>'+
+          '<li>文字サイズ・テーマ（和紙/白/夜）は<kbd><svg class=ic><use href=#ic-settings /></svg> 設定</kbd>で変更。</li>'+
         '</ul>'+
 
         '<h4>ふ ふりがな</h4>'+
         '<ul><li>読書画面の<kbd>ふ</kbd>ボタンで、難しい漢字にふりがなを付けます（もう一度で解除）。</li></ul>'+
 
-        '<h4>📚 調べる・💬 AIに聞く</h4>'+
+        '<h4><svg class=ic><use href=#ic-books /></svg> 調べる・<svg class=ic><use href=#ic-chat /></svg> AIに聞く</h4>'+
         '<ul>'+
-          '<li>本文を<b>長押し</b>すると語が選択され、そのまま<b>指を動かすと範囲を調整</b>できます（PCはドラッグ選択）。指を離すとメニュー：<b>🖍ハイライト／📝メモ／💬AIに聞く／📖辞書</b>。</li>'+
-          '<li>辞書は無料（Wiktionary・Wikipedia）。AIは作品全体にも質問でき、上部の<kbd>💬 AIに質問</kbd>から（テーマ／あらすじ／テスト対策 など）。</li>'+
+          '<li>本文を<b>長押し</b>すると語が選択され、そのまま<b>指を動かすと範囲を調整</b>できます（PCはドラッグ選択）。指を離すとメニュー：<b><svg class=ic><use href=#ic-highlight /></svg>ハイライト／<svg class=ic><use href=#ic-pen /></svg>メモ／<svg class=ic><use href=#ic-chat /></svg>AIに聞く／<svg class=ic><use href=#ic-book /></svg>辞書</b>。</li>'+
+          '<li>辞書は無料（Wiktionary・Wikipedia）。AIは作品全体にも質問でき、上部の<kbd><svg class=ic><use href=#ic-chat /></svg> AIに質問</kbd>から（テーマ／あらすじ／テスト対策 など）。</li>'+
         '</ul>'+
 
-        '<h4>🖍 記録する</h4>'+
+        '<h4><svg class=ic><use href=#ic-highlight /></svg> 記録する</h4>'+
         '<ul>'+
           '<li><b>ハイライト</b>：引いた箇所を<b>タップ</b>すると、色変更・メモ・削除ができます。</li>'+
-          '<li><b>メモ</b>・一覧は上部の<kbd>🖍 ノート</kbd>。<b>名文コレクション</b>(<kbd>📑 名文集</kbd>)は全作品の引用を横断表示。</li>'+
-          '<li><b>レビュー</b>(<kbd>📝</kbd>)で★と感想、<b>気になる</b>(<kbd>🔖</kbd>)であとで読む登録。</li>'+
+          '<li><b>メモ</b>・一覧は上部の<kbd><svg class=ic><use href=#ic-highlight /></svg> ノート</kbd>。<b>名文コレクション</b>(<kbd><svg class=ic><use href=#ic-collection /></svg> 名文集</kbd>)は全作品の引用を横断表示。</li>'+
+          '<li><b>レビュー</b>(<kbd><svg class=ic><use href=#ic-pen /></svg></kbd>)で★と感想、<b>気になる</b>(<kbd><svg class=ic><use href=#ic-bookmark /></svg></kbd>)であとで読む登録。</li>'+
         '</ul>'+
 
-        '<h4>🧭 選ぶ</h4>'+
+        '<h4><svg class=ic><use href=#ic-compass /></svg> 選ぶ</h4>'+
         '<ul>'+
           '<li>各作品に<b>難易度（●）</b>と<b>読了目安（分）</b>。並べ替え・「はじめての一冊」で選べます。</li>'+
-          '<li>棚の上に<b>次の一冊レコメンド</b>。<kbd>📊 統計</kbd>で読書の記録も見られます。</li>'+
+          '<li>棚の上に<b>次の一冊レコメンド</b>。<kbd><svg class=ic><use href=#ic-chart /></svg> 統計</kbd>で読書の記録も見られます。</li>'+
         '</ul>'+
 
-        '<h4>💾 便利機能</h4>'+
+        '<h4><svg class=ic><use href=#ic-save /></svg> 便利機能</h4>'+
         '<ul>'+
-          '<li><b>バックアップ</b>：<kbd>⚙️ 設定</kbd>でしおり・ハイライト等を書き出し／読み込み（端末の引っ越しに）。</li>'+
+          '<li><b>バックアップ</b>：<kbd><svg class=ic><use href=#ic-settings /></svg> 設定</kbd>でしおり・ハイライト等を書き出し／読み込み（端末の引っ越しに）。</li>'+
           '<li><b>ホーム画面に追加</b>すると、アプリのように起動でき、<b>一度読んだ作品はオフラインでも</b>読めます。</li>'+
         '</ul>'+
 
-        '<h4>🤖 AIを使うには</h4>'+
-        '<p>AIとの対話は、<kbd>⚙️ 設定</kbd>で<b>Geminiの無料APIキー</b>を入れると使えます（クレカ不要）。<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> でGoogleログイン→「Create API key」。キーは<b>この端末内だけ</b>に保存され、外部には送られません。</p>'+
+        '<h4><svg class=ic><use href=#ic-sparkle /></svg> AIを使うには</h4>'+
+        '<p>AIとの対話は、<kbd><svg class=ic><use href=#ic-settings /></svg> 設定</kbd>で<b>Geminiの無料APIキー</b>を入れると使えます（クレカ不要）。<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> でGoogleログイン→「Create API key」。キーは<b>この端末内だけ</b>に保存され、外部には送られません。</p>'+
 
-        '<div class="tip">💡 まずは「はじめての一冊」から一作開いて、わからない言葉をなぞって「📖辞書」を試してみてください。</div>'+
+        '<div class="tip"><svg class=ic><use href=#ic-bulb /></svg> まずは「はじめての一冊」から一作開いて、わからない言葉をなぞって「<svg class=ic><use href=#ic-book /></svg>辞書」を試してみてください。</div>'+
       '</div>'+
     '</div>';
   document.body.appendChild(scrim);
@@ -2154,6 +2484,12 @@ function openStats(){
       if(Array.isArray(r.highlights)) r.highlights.forEach(h=>{ if(h.text) hiCount++; }); }
   });
   const avg = reviews? (ratingSum/reviews).toFixed(1) : "—";
+  const rs = readStats();
+  const months = monthlyStats(6);
+  const maxMo = Math.max(1, ...months.map(x=>x.min));
+  const monthBars = months.some(x=>x.min>0)
+    ? months.map(x=>`<div class="auth-bar"><span class="name">${x.label}</span><span class="track"><span class="fill" style="width:${Math.round(x.min/maxMo*100)}%"></span></span><span class="cnt">${x.min}分</span></div>`).join("")
+    : `<div class="note">読書した月ごとの時間が、ここにグラフで出ます。</div>`;
   const authors=Object.entries(authorCount).sort((a,b)=>b[1]-a[1]).slice(0,6);
   const maxA=authors.length?authors[0][1]:1;
   const bars=authors.map(([a,c])=>`<div class="auth-bar"><span class="name">${a}</span><span class="track"><span class="fill" style="width:${Math.round(c/maxA*100)}%"></span></span><span class="cnt">${c}</span></div>`).join("")
@@ -2161,16 +2497,21 @@ function openStats(){
   const scrim=document.createElement("div"); scrim.className="scrim center"; scrim.onclick=(e)=>{ if(e.target===scrim) scrim.remove(); };
   scrim.innerHTML=`
     <div class="modal" onclick="event.stopPropagation()">
-      <div class="dhead"><h3>📊 読書統計</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
+      <div class="dhead"><h3><svg class=ic><use href=#ic-chart /></svg> 読書統計</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
       <div class="dbody">
         <div class="stat-grid">
           <div class="stat-tile"><div class="num">${done}<small> / ${WORKS.length}</small></div><div class="lbl">読了した作品</div></div>
-          <div class="stat-tile"><div class="num">${fmtHours(minutes)}</div><div class="lbl">読んだ目安時間</div></div>
+          <div class="stat-tile"><div class="num">${fmtHours(rs.totalMin)}</div><div class="lbl">実際の読書時間</div></div>
+          <div class="stat-tile"><div class="num"><svg class=ic><use href=#ic-flame /></svg> ${rs.streak}<small> 日</small></div><div class="lbl">連続読書日数</div></div>
+          <div class="stat-tile"><div class="num">${rs.days}<small> 日</small></div><div class="lbl">読書した日数</div></div>
           <div class="stat-tile"><div class="num">${doneThisYear}</div><div class="lbl">${thisYear}年の読了</div></div>
           <div class="stat-tile"><div class="num">${reading}</div><div class="lbl">読書中</div></div>
           <div class="stat-tile"><div class="num">${hiCount}</div><div class="lbl">ハイライト</div></div>
           <div class="stat-tile"><div class="num">★${avg}</div><div class="lbl">平均評価（${reviews}件）</div></div>
+          <div class="stat-tile"><div class="num">${fmtHours(minutes)}</div><div class="lbl">読了ぶんの目安時間</div></div>
         </div>
+        <div class="stat-head">月別の読書時間</div>
+        ${monthBars}
         <div class="stat-head">作者別 読了数</div>
         ${bars}
       </div>
@@ -2185,7 +2526,7 @@ function openCollection(){
   groups.sort((a,b)=> b.last.localeCompare(a.last));
   const total=groups.reduce((s,g)=>s+g.hs.length,0);
   let body;
-  if(!total){ body=`<div class="note">本文をなぞって「🖍 ハイライト」を引くと、心に残った一文がここに集まります。全作品を横断して読み返せます。</div>`; }
+  if(!total){ body=`<div class="note">本文をなぞって「<svg class=ic><use href=#ic-highlight /></svg> ハイライト」を引くと、心に残った一文がここに集まります。全作品を横断して読み返せます。</div>`; }
   else body = groups.map(g=>{
       const items=g.hs.slice().reverse().map(h=>`<div class="coll-quote">${escapeHtml(h.text)}</div>${h.note&&h.note.trim()?`<div class="coll-note">${escapeHtml(h.note)}</div>`:``}`).join("");
       return `<div class="coll-work" data-wid="${g.w.id}">『${g.w.title}』 ${g.w.author} ›</div>${items}`;
@@ -2193,7 +2534,7 @@ function openCollection(){
   const scrim=document.createElement("div"); scrim.className="scrim"; scrim.onclick=(e)=>{ if(e.target===scrim) scrim.remove(); };
   scrim.innerHTML=`
     <div class="drawer" onclick="event.stopPropagation()">
-      <div class="dhead"><h3>📑 名文コレクション${total?`（${total}）`:``}</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
+      <div class="dhead"><h3><svg class=ic><use href=#ic-collection /></svg> 名文コレクション${total?`（${total}）`:``}</h3><button class="icon-btn close" onclick="this.closest('.scrim').remove()">閉じる</button></div>
       <div class="dbody">${body}</div>
     </div>`;
   document.body.appendChild(scrim);
@@ -2207,6 +2548,7 @@ function escapeAttr(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&
 /* ---------- boot ---------- */
 applyTheme();
 renderLibrary();
+syncInit();
 /* PWA: Service Worker 登録（オフライン対応・インストール可能に） */
 if("serviceWorker" in navigator){
   window.addEventListener("load", ()=>{ navigator.serviceWorker.register("./sw.js").catch(()=>{}); });
